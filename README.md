@@ -337,7 +337,7 @@ let client = try CardSightAI(config: config)
 
 ## API Endpoint Coverage
 
-✅ **100% Coverage Verified** - Comprehensive audit completed on 2025-10-15
+✅ **100% Coverage Verified**
 
 The SDK provides complete coverage of all **76 CardSight AI REST API endpoints**:
 
@@ -365,8 +365,6 @@ The SDK includes **3 manual implementations** for endpoints with incomplete Open
 - 🔧 **POST /v1/identify/card** - Manual multipart upload with HEIC support
 - 🔧 **POST /v1/collection/{collectionId}/cards/{cardId}/image** - Manual multipart upload with HEIC support
 - 🔧 **GET /v1/images/cards/{id}** - Manual binary data extraction with platform-specific image types
-
-> 📋 **Detailed Audit Report**: See `audit-results/AUDIT-SUMMARY.md` for complete coverage analysis
 
 ## Building from Source
 
