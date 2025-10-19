@@ -83,8 +83,14 @@ switch result {
 case .ok(let response):
     switch response.body {
     case .json(let identification):
-        print("Card: \(identification.card?.name ?? "Unknown")")
-        print("Confidence: \(identification.confidence)%")
+        // The API can detect multiple cards in a single image
+        if let detection = identification.detections?.first {
+            print("Card: \(detection.card?.name ?? "Unknown")")
+            print("Confidence: \(detection.confidence)") // "High", "Medium", or "Low"
+            print("Total cards detected: \(identification.detections?.count ?? 0)")
+        } else {
+            print("No cards detected")
+        }
     }
 default:
     print("Identification failed")
@@ -116,7 +122,82 @@ let result = try await client.identify.card(image)
 // 4. Optimizes file size (max 5MB)
 // 5. Sends to API
 
-print("Identified card: \(result)")
+// Access the identification results
+switch result {
+case .ok(let response):
+    switch response.body {
+    case .json(let identification):
+        // Check if any cards were detected
+        guard let detections = identification.detections, !detections.isEmpty else {
+            print("No cards detected in image")
+            return
+        }
+
+        // Process all detected cards (the API can detect multiple cards in a single image)
+        print("Detected \(detections.count) card(s)")
+
+        for (index, detection) in detections.enumerated() {
+            print("\nCard \(index + 1):")
+            print("Confidence: \(detection.confidence)") // .High, .Medium, or .Low
+
+            if let card = detection.card {
+                print("  Name: \(card.name)")
+                print("  Year: \(card.year)")
+                print("  Manufacturer: \(card.manufacturer)")
+                print("  Release: \(card.releaseName)")
+                if let setName = card.setName {
+                    print("  Set: \(setName)")
+                }
+                if let number = card.number {
+                    print("  Number: \(number)")
+                }
+            }
+        }
+    }
+default:
+    print("Identification failed")
+}
+```
+
+### Advanced Identification Features
+
+The identify endpoint returns detailed metadata and supports multiple card detection:
+
+```swift
+let result = try await client.identify.card(image)
+
+switch result {
+case .ok(let response):
+    switch response.body {
+    case .json(let identification):
+        // Access request metadata
+        print("Request ID: \(identification.requestId)")
+        if let processingTime = identification.processingTime {
+            print("Processing time: \(processingTime)ms")
+        }
+
+        // Handle single or multiple card detection
+        if let detections = identification.detections {
+            switch detections.count {
+            case 0:
+                print("No cards detected")
+            case 1:
+                print("Single card detected")
+            default:
+                print("Multiple cards detected: \(detections.count)")
+            }
+
+            // Each detection represents a physical card in the image
+            for detection in detections {
+                if let card = detection.card {
+                    print("[\(detection.confidence)] \(card.name) - \(card.year)")
+                }
+            }
+        }
+    }
+default:
+    break
+}
 ```
 
 ### Custom Image Processing Options

@@ -110,118 +110,64 @@
                                         "requestId": {
                                             "type": "string"
                                         },
-                                        "data": {
-                                            "type": "object",
-                                            "properties": {
-                                                "cardId": {
-                                                    "description": "UUID of identified card (if found in database)",
-                                                    "type": "string"
-                                                },
-                                                "confidence": {
-                                                    "type": "number"
-                                                },
-                                                "detectionConfidence": {
-                                                    "type": "number"
-                                                },
-                                                "classificationConfidence": {
-                                                    "type": "number"
-                                                },
-                                                "aiIdentification": {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "year": {
-                                                            "type": "string"
-                                                        },
-                                                        "release": {
-                                                            "type": "string"
-                                                        },
-                                                        "set": {
-                                                            "type": "string"
-                                                        },
-                                                        "name": {
-                                                            "type": "string"
-                                                        },
-                                                        "number": {
-                                                            "type": "string"
-                                                        }
+                                        "detections": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "confidence": {
+                                                        "description": "Confidence level of the card identification",
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "High",
+                                                            "Medium",
+                                                            "Low"
+                                                        ]
                                                     },
-                                                    "required": [
-                                                        "year",
-                                                        "release",
-                                                        "name"
-                                                    ],
-                                                    "additionalProperties": false
+                                                    "card": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "description": "UUID of the card",
+                                                                "type": "string"
+                                                            },
+                                                            "year": {
+                                                                "type": "string"
+                                                            },
+                                                            "manufacturer": {
+                                                                "type": "string"
+                                                            },
+                                                            "releaseName": {
+                                                                "type": "string"
+                                                            },
+                                                            "setName": {
+                                                                "type": "string"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "number": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "year",
+                                                            "manufacturer",
+                                                            "releaseName",
+                                                            "name"
+                                                        ],
+                                                        "additionalProperties": false
+                                                    }
                                                 },
-                                                "card": {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "id": {
-                                                            "description": "UUID of the card",
-                                                            "type": "string"
-                                                        },
-                                                        "year": {
-                                                            "type": "string"
-                                                        },
-                                                        "manufacturer": {
-                                                            "type": "string"
-                                                        },
-                                                        "release": {
-                                                            "type": "string"
-                                                        },
-                                                        "set": {
-                                                            "type": "string"
-                                                        },
-                                                        "playerName": {
-                                                            "type": "string"
-                                                        },
-                                                        "cardNumber": {
-                                                            "type": "string"
-                                                        },
-                                                        "variant": {
-                                                            "type": "string"
-                                                        },
-                                                        "frontImageUrl": {
-                                                            "type": "string"
-                                                        },
-                                                        "backImageUrl": {
-                                                            "type": "string"
-                                                        }
-                                                    },
-                                                    "required": [
-                                                        "id",
-                                                        "year",
-                                                        "manufacturer",
-                                                        "release",
-                                                        "playerName"
-                                                    ],
-                                                    "additionalProperties": false
-                                                },
-                                                "processingTime": {
-                                                    "type": "number"
-                                                }
-                                            },
-                                            "required": [
-                                                "confidence",
-                                                "aiIdentification",
-                                                "processingTime"
-                                            ],
-                                            "additionalProperties": false
+                                                "required": [
+                                                    "confidence"
+                                                ],
+                                                "additionalProperties": false
+                                            }
                                         },
-                                        "error": {
-                                            "type": "object",
-                                            "properties": {
-                                                "code": {
-                                                    "type": "string"
-                                                },
-                                                "message": {
-                                                    "type": "string"
-                                                }
-                                            },
-                                            "required": [
-                                                "code",
-                                                "message"
-                                            ],
-                                            "additionalProperties": false
+                                        "processingTime": {
+                                            "type": "number"
                                         }
                                     },
                                     "required": [
@@ -240,32 +186,18 @@
                                 "schema": {
                                     "type": "object",
                                     "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "enum": [
-                                                false
-                                            ]
-                                        },
                                         "error": {
-                                            "type": "object",
-                                            "properties": {
-                                                "code": {
-                                                    "type": "string"
-                                                },
-                                                "message": {
-                                                    "type": "string"
-                                                }
-                                            },
-                                            "required": [
-                                                "code",
-                                                "message"
-                                            ],
-                                            "additionalProperties": false
+                                            "description": "Error message",
+                                            "type": "string"
+                                        },
+                                        "code": {
+                                            "description": "Error code for programmatic handling",
+                                            "type": "string"
                                         }
                                     },
                                     "required": [
-                                        "success",
-                                        "error"
+                                        "error",
+                                        "code"
                                     ],
                                     "additionalProperties": false
                                 }
@@ -279,32 +211,43 @@
                                 "schema": {
                                     "type": "object",
                                     "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "enum": [
-                                                false
-                                            ]
-                                        },
                                         "error": {
-                                            "type": "object",
-                                            "properties": {
-                                                "code": {
-                                                    "type": "string"
-                                                },
-                                                "message": {
-                                                    "type": "string"
-                                                }
-                                            },
-                                            "required": [
-                                                "code",
-                                                "message"
-                                            ],
-                                            "additionalProperties": false
+                                            "description": "Error message",
+                                            "type": "string"
+                                        },
+                                        "code": {
+                                            "description": "Error code for programmatic handling",
+                                            "type": "string"
                                         }
                                     },
                                     "required": [
-                                        "success",
-                                        "error"
+                                        "error",
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "408": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "description": "Error message",
+                                            "type": "string"
+                                        },
+                                        "code": {
+                                            "description": "Error code for programmatic handling",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "error",
+                                        "code"
                                     ],
                                     "additionalProperties": false
                                 }
@@ -318,32 +261,43 @@
                                 "schema": {
                                     "type": "object",
                                     "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "enum": [
-                                                false
-                                            ]
-                                        },
                                         "error": {
-                                            "type": "object",
-                                            "properties": {
-                                                "code": {
-                                                    "type": "string"
-                                                },
-                                                "message": {
-                                                    "type": "string"
-                                                }
-                                            },
-                                            "required": [
-                                                "code",
-                                                "message"
-                                            ],
-                                            "additionalProperties": false
+                                            "description": "Error message",
+                                            "type": "string"
+                                        },
+                                        "code": {
+                                            "description": "Error code for programmatic handling",
+                                            "type": "string"
                                         }
                                     },
                                     "required": [
-                                        "success",
-                                        "error"
+                                        "error",
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "description": "Error message",
+                                            "type": "string"
+                                        },
+                                        "code": {
+                                            "description": "Error code for programmatic handling",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "error",
+                                        "code"
                                     ],
                                     "additionalProperties": false
                                 }
@@ -16145,6 +16099,34 @@
                                             }
                                         },
                                         "additionalProperties": {}
+                                    },
+                                    "conversationHistory": {
+                                        "description": "Optional conversation history (max 50 messages). Messages should alternate between user and assistant roles.",
+                                        "maxItems": 50,
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "role": {
+                                                    "description": "The role of the message sender",
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "user",
+                                                        "assistant"
+                                                    ]
+                                                },
+                                                "content": {
+                                                    "description": "The message content",
+                                                    "type": "string",
+                                                    "minLength": 1,
+                                                    "maxLength": 10000
+                                                }
+                                            },
+                                            "required": [
+                                                "role",
+                                                "content"
+                                            ]
+                                        }
                                     },
                                     "maxIterations": {
                                         "description": "Maximum tool use iterations (default: 5)",
