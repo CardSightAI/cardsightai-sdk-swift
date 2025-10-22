@@ -43,6 +43,24 @@ public class ImageProcessor {
         // Check file size and adjust quality if needed
         return try adjustQualityIfNeeded(resizedImage, initialData: jpegData, options: opts)
     }
+
+    /// Optimize a UIImage for upload with aggressive size reduction
+    /// - Parameter image: The UIImage to optimize
+    /// - Returns: Optimized image data ready for upload (smallest dimension: 900px, 80% JPEG quality)
+    public func optimizeForUpload(_ image: UIImage) async throws -> Data {
+        // Correct orientation
+        let correctedImage = image.correctingOrientation()
+
+        // Resize based on smallest dimension
+        let resizedImage = try resizeBySmallestDimension(correctedImage, minDimension: 900)
+
+        // Convert to JPEG with 80% quality
+        guard let jpegData = resizedImage.jpegData(compressionQuality: 0.80) else {
+            throw CardSightAIError.imageProcessingError("Failed to convert image to JPEG format")
+        }
+
+        return jpegData
+    }
     #endif
 
     #if canImport(AppKit)
@@ -66,6 +84,23 @@ public class ImageProcessor {
 
         // Check file size and adjust quality if needed
         return try adjustQualityIfNeeded(resizedImage, initialData: jpegData, options: opts)
+    }
+
+    /// Optimize an NSImage for upload with aggressive size reduction
+    /// - Parameter image: The NSImage to optimize
+    /// - Returns: Optimized image data ready for upload (smallest dimension: 900px, 80% JPEG quality)
+    public func optimizeForUpload(_ image: NSImage) async throws -> Data {
+        // Resize based on smallest dimension
+        let resizedImage = try resizeBySmallestDimension(image, minDimension: 900)
+
+        // Convert to JPEG with 80% quality
+        guard let tiffData = resizedImage.tiffRepresentation,
+              let bitmapImage = NSBitmapImageRep(data: tiffData),
+              let jpegData = bitmapImage.representation(using: .jpeg, properties: [.compressionFactor: 0.80]) else {
+            throw CardSightAIError.imageProcessingError("Failed to convert image to JPEG format")
+        }
+
+        return jpegData
     }
     #endif
 
@@ -108,6 +143,50 @@ public class ImageProcessor {
     public func processForUpload(_ url: URL, customOptions: ImageProcessingOptions? = nil) async throws -> Data {
         let data = try Data(contentsOf: url)
         return try await processForUpload(data, customOptions: customOptions)
+    }
+
+    /// Optimize image data for upload with aggressive size reduction
+    /// - Parameter imageData: The image data to optimize
+    /// - Returns: Optimized image data ready for upload (smallest dimension: 900px, 80% JPEG quality)
+    public func optimizeForUpload(_ imageData: Data) async throws -> Data {
+        // Check if this is HEIC/HEIF format and convert first
+        if isHEICFormat(imageData) {
+            guard let imageSource = CGImageSourceCreateWithData(imageData as CFData, nil),
+                  let cgImage = CGImageSourceCreateImageAtIndex(imageSource, 0, nil) else {
+                throw CardSightAIError.imageProcessingError("Failed to read HEIC image data")
+            }
+
+            #if canImport(UIKit)
+            let image = UIImage(cgImage: cgImage)
+            return try await optimizeForUpload(image)
+            #elseif canImport(AppKit)
+            let image = NSImage(cgImage: cgImage, size: NSSize(width: cgImage.width, height: cgImage.height))
+            return try await optimizeForUpload(image)
+            #endif
+        }
+
+        // Process JPEG or PNG
+        if isJPEGFormat(imageData) || isPNGFormat(imageData) {
+            #if canImport(UIKit)
+            if let image = UIImage(data: imageData) {
+                return try await optimizeForUpload(image)
+            }
+            #elseif canImport(AppKit)
+            if let image = NSImage(data: imageData) {
+                return try await optimizeForUpload(image)
+            }
+            #endif
+        }
+
+        throw CardSightAIError.imageProcessingError("Unsupported image format. Please provide JPEG, PNG, or HEIC/HEIF images.")
+    }
+
+    /// Optimize an image from a URL for upload with aggressive size reduction
+    /// - Parameter url: The URL of the image file
+    /// - Returns: Optimized image data ready for upload (smallest dimension: 900px, 80% JPEG quality)
+    public func optimizeForUpload(_ url: URL) async throws -> Data {
+        let data = try Data(contentsOf: url)
+        return try await optimizeForUpload(data)
     }
 
     // MARK: - Private Methods
@@ -196,6 +275,40 @@ public class ImageProcessor {
         return resizedImage
     }
 
+    private func resizeBySmallestDimension(_ image: UIImage, minDimension: CGFloat) throws -> UIImage {
+        let size = image.size
+
+        // Check if resizing is needed (if smallest dimension is already <= target)
+        let currentSmallest = min(size.width, size.height)
+        if currentSmallest <= minDimension {
+            return image
+        }
+
+        // Calculate new size maintaining aspect ratio based on smallest dimension
+        let aspectRatio = size.width / size.height
+        let newSize: CGSize
+
+        if size.width < size.height {
+            // Width is smaller, so set it to minDimension
+            newSize = CGSize(width: minDimension, height: minDimension / aspectRatio)
+        } else {
+            // Height is smaller, so set it to minDimension
+            newSize = CGSize(width: minDimension * aspectRatio, height: minDimension)
+        }
+
+        // Resize the image
+        UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
+        defer { UIGraphicsEndImageContext() }
+
+        image.draw(in: CGRect(origin: .zero, size: newSize))
+
+        guard let resizedImage = UIGraphicsGetImageFromCurrentImageContext() else {
+            throw CardSightAIError.imageProcessingError("Failed to resize image")
+        }
+
+        return resizedImage
+    }
+
     private func adjustQualityIfNeeded(_ image: UIImage, initialData: Data, options: ImageProcessingOptions) throws -> Data {
         var jpegData = initialData
         var currentQuality = options.jpegQuality
@@ -235,6 +348,36 @@ public class ImageProcessor {
             newSize = NSSize(width: maxDimension, height: maxDimension / aspectRatio)
         } else {
             newSize = NSSize(width: maxDimension * aspectRatio, height: maxDimension)
+        }
+
+        // Create resized image
+        let resizedImage = NSImage(size: newSize)
+        resizedImage.lockFocus()
+        image.draw(in: NSRect(origin: .zero, size: newSize))
+        resizedImage.unlockFocus()
+
+        return resizedImage
+    }
+
+    private func resizeBySmallestDimension(_ image: NSImage, minDimension: CGFloat) throws -> NSImage {
+        let size = image.size
+
+        // Check if resizing is needed (if smallest dimension is already <= target)
+        let currentSmallest = min(size.width, size.height)
+        if currentSmallest <= minDimension {
+            return image
+        }
+
+        // Calculate new size maintaining aspect ratio based on smallest dimension
+        let aspectRatio = size.width / size.height
+        let newSize: NSSize
+
+        if size.width < size.height {
+            // Width is smaller, so set it to minDimension
+            newSize = NSSize(width: minDimension, height: minDimension / aspectRatio)
+        } else {
+            // Height is smaller, so set it to minDimension
+            newSize = NSSize(width: minDimension * aspectRatio, height: minDimension)
         }
 
         // Create resized image

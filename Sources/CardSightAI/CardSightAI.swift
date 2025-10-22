@@ -356,7 +356,9 @@ public class IdentifyAPI {
     /// This method accepts images from iOS camera, photo library, or any `UIImage` source.
     /// HEIC images are automatically converted to JPEG, and the image is optimized for upload.
     ///
-    /// - Parameter image: The image containing the trading card
+    /// - Parameters:
+    ///   - image: The image containing the trading card
+    ///   - optimized: Whether to optimize the image for upload (smallest dimension: 900px, 80% JPEG quality). Default: true
     /// - Returns: Card identification result with matched card information
     /// - Throws: ``CardSightAIError/imageProcessingError(_:)`` if image processing fails
     /// - Throws: ``CardSightAIError/networkError(_:)`` if upload fails
@@ -364,24 +366,30 @@ public class IdentifyAPI {
     ///
     /// # Example
     /// ```swift
-    /// // Capture from camera
+    /// // Capture from camera with optimization (recommended for cellular networks)
     /// let picker = UIImagePickerController()
     /// picker.sourceType = .camera
     /// // ... get selected image
     ///
     /// let result = try await client.identify.card(selectedImage)
+    ///
+    /// // Or disable optimization to send full resolution
+    /// let result = try await client.identify.card(selectedImage, optimized: false)
     /// ```
     ///
-    /// - Note: Images are automatically resized to maximum 2048x2048 pixels by default.
-    ///   Configure ``ImageProcessingOptions`` in ``CardSightAIConfig`` to customize.
-    public func card(_ image: UIImage) async throws -> Operations.post_sol_v1_sol_identify_sol_card.Output {
+    /// - Note: When optimized is true, images are resized so the smallest dimension is 900px with 80% JPEG quality.
+    ///   When optimized is false but autoProcessImages is enabled, images are resized to maximum 2048x2048 pixels.
+    ///   Configure ``ImageProcessingOptions`` in ``CardSightAIConfig`` to customize non-optimized processing.
+    public func card(_ image: UIImage, optimized: Bool = true) async throws -> Operations.post_sol_v1_sol_identify_sol_card.Output {
         guard let client = client else {
             throw CardSightAIError.unknown("Client has been deallocated")
         }
 
-        // Process the image if auto-processing is enabled
+        // Use optimization or standard processing
         let imageData: Data
-        if client.config.autoProcessImages {
+        if optimized {
+            imageData = try await client.imageProcessor.optimizeForUpload(image)
+        } else if client.config.autoProcessImages {
             imageData = try await client.imageProcessor.processForUpload(image)
         } else {
             guard let data = image.jpegData(compressionQuality: 0.8) else {
@@ -396,14 +404,24 @@ public class IdentifyAPI {
 
     #if canImport(AppKit)
     /// Identify a card from an NSImage
-    public func card(_ image: NSImage) async throws -> Operations.post_sol_v1_sol_identify_sol_card.Output {
+    ///
+    /// - Parameters:
+    ///   - image: The image containing the trading card
+    ///   - optimized: Whether to optimize the image for upload (smallest dimension: 900px, 80% JPEG quality). Default: true
+    /// - Returns: Card identification result with matched card information
+    /// - Throws: ``CardSightAIError/imageProcessingError(_:)`` if image processing fails
+    /// - Throws: ``CardSightAIError/networkError(_:)`` if upload fails
+    /// - Throws: ``CardSightAIError/apiError(statusCode:message:response:)`` if identification fails
+    public func card(_ image: NSImage, optimized: Bool = true) async throws -> Operations.post_sol_v1_sol_identify_sol_card.Output {
         guard let client = client else {
             throw CardSightAIError.unknown("Client has been deallocated")
         }
 
-        // Process the image if auto-processing is enabled
+        // Use optimization or standard processing
         let imageData: Data
-        if client.config.autoProcessImages {
+        if optimized {
+            imageData = try await client.imageProcessor.optimizeForUpload(image)
+        } else if client.config.autoProcessImages {
             imageData = try await client.imageProcessor.processForUpload(image)
         } else {
             guard let tiffData = image.tiffRepresentation,
@@ -419,14 +437,24 @@ public class IdentifyAPI {
     #endif
 
     /// Identify a card from image data
-    public func card(_ imageData: Data) async throws -> Operations.post_sol_v1_sol_identify_sol_card.Output {
+    ///
+    /// - Parameters:
+    ///   - imageData: The image data to process
+    ///   - optimized: Whether to optimize the image for upload (smallest dimension: 900px, 80% JPEG quality). Default: true
+    /// - Returns: Card identification result with matched card information
+    /// - Throws: ``CardSightAIError/imageProcessingError(_:)`` if image processing fails
+    /// - Throws: ``CardSightAIError/networkError(_:)`` if upload fails
+    /// - Throws: ``CardSightAIError/apiError(statusCode:message:response:)`` if identification fails
+    public func card(_ imageData: Data, optimized: Bool = true) async throws -> Operations.post_sol_v1_sol_identify_sol_card.Output {
         guard let client = client else {
             throw CardSightAIError.unknown("Client has been deallocated")
         }
 
-        // Process the image if auto-processing is enabled
+        // Use optimization or standard processing
         let processedData: Data
-        if client.config.autoProcessImages {
+        if optimized {
+            processedData = try await client.imageProcessor.optimizeForUpload(imageData)
+        } else if client.config.autoProcessImages {
             processedData = try await client.imageProcessor.processForUpload(imageData)
         } else {
             processedData = imageData
@@ -436,14 +464,24 @@ public class IdentifyAPI {
     }
 
     /// Identify a card from a file URL
-    public func card(_ url: URL) async throws -> Operations.post_sol_v1_sol_identify_sol_card.Output {
+    ///
+    /// - Parameters:
+    ///   - url: The URL of the image file
+    ///   - optimized: Whether to optimize the image for upload (smallest dimension: 900px, 80% JPEG quality). Default: true
+    /// - Returns: Card identification result with matched card information
+    /// - Throws: ``CardSightAIError/imageProcessingError(_:)`` if image processing fails
+    /// - Throws: ``CardSightAIError/networkError(_:)`` if upload fails
+    /// - Throws: ``CardSightAIError/apiError(statusCode:message:response:)`` if identification fails
+    public func card(_ url: URL, optimized: Bool = true) async throws -> Operations.post_sol_v1_sol_identify_sol_card.Output {
         guard let client = client else {
             throw CardSightAIError.unknown("Client has been deallocated")
         }
 
-        // Process the image if auto-processing is enabled
+        // Use optimization or standard processing
         let imageData: Data
-        if client.config.autoProcessImages {
+        if optimized {
+            imageData = try await client.imageProcessor.optimizeForUpload(url)
+        } else if client.config.autoProcessImages {
             imageData = try await client.imageProcessor.processForUpload(url)
         } else {
             imageData = try Data(contentsOf: url)

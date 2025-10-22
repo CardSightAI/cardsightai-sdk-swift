@@ -5,7 +5,28 @@ All notable changes to the CardSight AI Swift SDK will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.2.0] - 2025-10-22
+
+### Added
+- **Image Upload Optimization**: New `optimized` parameter on all card identification methods to reduce upload times
+  - Intelligently resizes images based on smallest dimension (900px) while maintaining aspect ratio
+  - Applies 80% JPEG compression for optimal balance of quality and file size
+  - Significantly reduces upload time on cellular networks without compromising identification accuracy
+  - **Enabled by default** to optimize for cellular network performance
+  - Enabled by default for all identification methods: `card(_ image:)`, `card(_ imageData:)`, `card(_ url:)`
+  - If your use case is primarily WiFi-based, set `optimized: false` to upload high-resolution images (max dimension 2048px, standard compression)
+
+### Changed
+- **BEHAVIOR CHANGE**: Card identification now optimizes images by default for faster cellular uploads
+  - Optimized for cellular network performance - reduces upload time and data usage
+  - For WiFi-only use cases or when high-resolution images are required, pass `optimized: false` to any `card()` method
+  - Configuration via `ImageProcessingOptions` still applies when `optimized: false`
+
+### Technical Details
+- New `optimizeForUpload()` methods in `ImageProcessor` for all input types (UIImage, NSImage, Data, URL)
+- Optimization ensures smallest dimension is 900px with 80% JPEG quality
+- HEIC conversion and orientation correction still applied during optimization
+- Backward compatible: existing `processForUpload()` methods unchanged
 
 ## [1.1.0] - 2025-10-19
 
