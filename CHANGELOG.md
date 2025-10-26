@@ -5,6 +5,29 @@ All notable changes to the CardSight AI Swift SDK will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2025-10-26
+
+### Added
+- **Random Catalog Endpoints**: Three new endpoints for pack opening simulations and discovery features
+  - `client.catalog.releases.random(query:)` - Get random releases matching filters
+  - `client.catalog.sets.random(query:)` - Get random sets matching filters
+  - `client.catalog.cards.random(query:)` - Get random cards with optional parallel odds system
+- **Parallel Odds System**: Cards random endpoint includes sophisticated parallel conversion
+  - Enable with `includeParallels=true` query parameter
+  - Simulates pack opening with weighted probability for numbered parallels (/1, /10, /99, etc.)
+  - Collective roll for unlimited parallels (Refractor, Rainbow, etc.)
+  - Returns `isParallel`, `parallelId`, `parallelName`, and `numberedTo` fields for parallel cards
+- All random endpoints support standard filters (year, manufacturer, segment, search)
+- Count parameter (1-200) controls number of random results returned
+- Duplicate-free results even when count exceeds available records
+
+### Technical Details
+- Added three wrapper methods to `CatalogAPI.swift` for clean SDK interface
+- Auto-generated types from updated OpenAPI specification
+- Database-level randomization (`ORDER BY RANDOM()`) for true random distribution
+- `setId` and `releaseId` are mutually exclusive on cards endpoint (400 error if both specified)
+- Comprehensive DocC documentation with usage examples for all three endpoints
+
 ## [1.2.0] - 2025-10-22
 
 ### Added
