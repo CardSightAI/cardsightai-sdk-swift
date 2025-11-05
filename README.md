@@ -51,7 +51,7 @@ Add the following to your `Package.swift` file:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/cardsightai/cardsightai-sdk-swift.git", from: "1.0.0")
+    .package(url: "https://github.com/cardsightai/cardsightai-sdk-swift.git", from: "2.0.0")
 ]
 ```
 
@@ -239,103 +239,118 @@ let result = try await client.identify.card(nsImage)
 
 ```swift
 // Search for cards with query parameters
-var query = Operations.get_sol_v1_sol_catalog_sol_cards.Input.Query()
+var query = Operations.getCards.Input.Query()
 query.name = "Aaron Judge"
 query.year = 2023
 query.take = 10
 
-let cards = try await client.catalog.cards.list(query: query)
+let result = try await client.raw.getCards(query: query)
+if case .ok(let response) = result {
+    print("Found \(response.body.json.items.count) cards")
+}
 
 // Get specific card
-let card = try await client.catalog.cards.get(id: "card_uuid")
+let card = try await client.raw.getCard(.init(path: .init(id: "card_uuid")))
 
 // Search sets
-var setsQuery = Operations.get_sol_v1_sol_catalog_sol_sets.Input.Query()
+var setsQuery = Operations.getSets.Input.Query()
 setsQuery.year = 2023
 setsQuery.take = 20
 
-let sets = try await client.catalog.sets.list(query: setsQuery)
+let sets = try await client.raw.getSets(query: setsQuery)
 
 // Get specific set with details
-let set = try await client.catalog.sets.get(id: "set_uuid")
+let set = try await client.raw.getSet(.init(path: .init(id: "set_uuid")))
 
 // Get cards in a set
-let setCards = try await client.catalog.sets.cards(id: "set_uuid")
+let setCards = try await client.raw.getSetCards(.init(path: .init(id: "set_uuid")))
 
 // Search releases
-var releasesQuery = Operations.get_sol_v1_sol_catalog_sol_releases.Input.Query()
+var releasesQuery = Operations.getReleases.Input.Query()
 releasesQuery.name = "Chrome"
 releasesQuery.yearFrom = 2020
 releasesQuery.yearTo = 2024
 
-let releases = try await client.catalog.releases.list(query: releasesQuery)
+let releases = try await client.raw.getReleases(query: releasesQuery)
 
 // Get manufacturers
-let manufacturers = try await client.catalog.manufacturers()
+let manufacturers = try await client.raw.getManufacturers()
 
 // Get segments (Baseball, Pokemon, etc.)
-let segments = try await client.catalog.segments()
+let segments = try await client.raw.getSegments()
 
 // Get parallels
-let parallels = try await client.catalog.parallels()
+let parallels = try await client.raw.getParallels()
 
 // Get catalog statistics
-let stats = try await client.catalog.statistics()
+let stats = try await client.raw.getCatalogStatistics()
 ```
 
 ### Collection Management
 
 ```swift
 // Create a collection
-let collection = try await client.collections.create(
-    name: "My Vintage Cards",
-    description: "Pre-1980 baseball cards",
-    collectorId: "collector_uuid"
+let createInput = Operations.createCollection.Input(
+    body: .json(.init(
+        name: "My Vintage Cards",
+        description: "Pre-1980 baseball cards",
+        collectorId: "collector_uuid"
+    ))
 )
+let collection = try await client.raw.createCollection(createInput)
 
 // Add card to collection
-try await client.collections.cards.add(
-    collectionId: collection.id,
-    cardId: "card_uuid",
-    quantity: 1,
-    buyPrice: "50.00",
-    buyDate: "2024-01-15"
+let addCardInput = Operations.addCardsToCollection.Input(
+    path: .init(collectionId: "collection_uuid"),
+    body: .json(.init(
+        cards: [.init(
+            cardId: "card_uuid",
+            quantity: 1,
+            buyPrice: "50.00",
+            buyDate: "2024-01-15"
+        )]
+    ))
 )
+try await client.raw.addCardsToCollection(addCardInput)
 
 // Get collection analytics
-let analytics = try await client.collections.analytics(collectionId: collection.id)
-print("Total value: \(analytics.totalValue)")
+let analytics = try await client.raw.getCollectionAnalytics(
+    .init(path: .init(collectionId: "collection_uuid"))
+)
 ```
 
 ### Image Retrieval
 
-Retrieve card images directly as platform-native image types or raw data:
+Retrieve card images using the generated client:
 
 ```swift
-#if canImport(UIKit)
-// Get card image as UIImage (iOS/tvOS/watchOS)
-let cardImage = try await client.images.getCardImage(id: "card_uuid")
-imageView.image = cardImage
+// Get card image data
+let imageResult = try await client.raw.getCardImage(
+    .init(path: .init(id: "card_uuid"))
+)
 
-// Or get raw JPEG data
-let imageData = try await client.images.getCardData(id: "card_uuid", format: "raw")
-#endif
+if case .ok(let response) = imageResult {
+    if case .image_sol_jpeg(let imageBody) = response.body {
+        let imageData = try await Data(collecting: imageBody, upTo: 10 * 1024 * 1024) // 10MB limit
 
-#if canImport(AppKit)
-// Get card image as NSImage (macOS)
-let cardImage = try await client.images.getCardImage(id: "card_uuid")
-imageView.image = cardImage
-#endif
+        #if canImport(UIKit)
+        let image = UIImage(data: imageData)
+        imageView.image = image
+        #endif
 
-// Get base64-encoded image (format: "json")
-let imageData = try await client.images.getCardData(id: "card_uuid", format: "json")
+        #if canImport(AppKit)
+        let image = NSImage(data: imageData)
+        imageView.image = image
+        #endif
+    }
+}
 ```
 
 ### Error Handling
 
 ```swift
 do {
-    let result = try await client.catalog.cards.get(id: "invalid_id")
+    let result = try await client.raw.getCard(.init(path: .init(id: "invalid_id")))
 } catch let error as CardSightAIError {
     switch error {
     case .authenticationError(let message):
@@ -420,32 +435,30 @@ let client = try CardSightAI(config: config)
 
 ✅ **100% Coverage Verified**
 
-The SDK provides complete coverage of all **76 CardSight AI REST API endpoints**:
+The SDK provides complete coverage of all **79 CardSight AI REST API endpoints** (including 3 new random catalog endpoints):
 
 | Category | Endpoints | Coverage | SDK Access |
 |----------|-----------|----------|------------|
-| **Health** | 2 | 100% | `client.health.*` |
-| **Card Identification** | 1 | 100% | `client.identify.*` |
-| **Catalog** | 14 | 100% | `client.catalog.*` |
-| **Collections** | 23 | 100% | `client.collections.*` |
-| **Collection Images** | 3 | 100% | `client.collections.cards.*` |
-| **Collectors** | 5 | 100% | `client.collectors.*` |
-| **Lists** | 8 | 100% | `client.lists.*` |
-| **Grades** | 3 | 100% | `client.grades.*` |
-| **Autocomplete** | 6 | 100% | `client.autocomplete.*` |
-| **AI** | 1 | 100% | `client.ai.*` |
-| **Images** | 1 | 100% | `client.images.*` |
-| **Feedback** | 8 | 100% | `client.feedback.*` |
-| **Subscription** | 1 | 100% | `client.subscription.*` |
-| **TOTAL** | **76** | **100%** | - |
+| **Health** | 2 | 100% | `client.getHealth()`, `client.getHealthAuthenticated()` |
+| **Card Identification** | 1 | 100% | `client.identify.card()` |
+| **Catalog** | 17 | 100% | `client.raw.getCards()`, `client.raw.getSets()`, etc. |
+| **Collections** | 23 | 100% | `client.raw.getCollections()`, `client.raw.createCollection()`, etc. |
+| **Collectors** | 5 | 100% | `client.raw.getCollectors()`, etc. |
+| **Lists** | 8 | 100% | `client.raw.getLists()`, etc. |
+| **Grades** | 3 | 100% | `client.raw.getGradingCompanies()`, etc. |
+| **Autocomplete** | 6 | 100% | `client.raw.autocompleteCards()`, etc. |
+| **AI** | 1 | 100% | `client.raw.queryAI()` |
+| **Images** | 1 | 100% | `client.raw.getCardImage()` |
+| **Feedback** | 8 | 100% | `client.raw.submitGeneralFeedback()`, etc. |
+| **Subscription** | 1 | 100% | `client.raw.getSubscription()` |
+| **TOTAL** | **79** | **100%** | - |
 
-### Special Implementations
+### Special Features
 
-The SDK includes **3 manual implementations** for endpoints with incomplete OpenAPI schemas:
+The SDK includes a convenience wrapper for card identification that handles image processing automatically:
 
-- 🔧 **POST /v1/identify/card** - Manual multipart upload with HEIC support
-- 🔧 **POST /v1/collection/{collectionId}/cards/{cardId}/image** - Manual multipart upload with HEIC support
-- 🔧 **GET /v1/images/cards/{id}** - Manual binary data extraction with platform-specific image types
+- 🎯 **`client.identify.card()`** - Automatic HEIC conversion, resizing, optimization, and multipart upload
+- All other endpoints use the auto-generated client directly via `client.raw.{operationName}()`
 
 ## Building from Source
 

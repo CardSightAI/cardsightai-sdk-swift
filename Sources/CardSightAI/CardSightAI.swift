@@ -26,6 +26,10 @@ import AppKit
 ///
 /// // Identify a card from an image
 /// let result = try await client.identify.card(image)
+///
+/// // Use the raw client for all other operations
+/// let cards = try await client.getCards(query: .init(search: "Bonds"))
+/// let collections = try await client.getCollections()
 /// ```
 ///
 /// # Features
@@ -50,75 +54,11 @@ public class CardSightAI {
     /// Provides direct access to image processing utilities for custom workflows.
     public let imageProcessor: ImageProcessor
 
-    /// Health check endpoints
+    /// Card identification helper
     ///
-    /// Provides methods to check API connectivity and authentication status.
-    /// - ``HealthAPI/check()`` - Basic health check (no authentication)
-    /// - ``HealthAPI/checkAuth()`` - Authenticated health check
-    public lazy var health = HealthAPI(client: self)
-
-    /// Card identification endpoints
-    ///
-    /// Identify trading cards from images using AI-powered recognition.
-    /// Automatically handles HEIC conversion, resizing, and optimization.
-    ///
-    /// # Example
-    /// ```swift
-    /// let image: UIImage = // ... from camera or photo library
-    /// let result = try await client.identify.card(image)
-    /// ```
+    /// Provides convenient methods for identifying cards with automatic image processing.
+    /// For direct API access, use the ``raw`` client.
     public lazy var identify = IdentifyAPI(client: self)
-
-    /// Catalog endpoints
-    ///
-    /// Search and browse the comprehensive baseball card catalog with 2M+ cards.
-    /// Includes cards, sets, releases, manufacturers, and more.
-    public lazy var catalog = CatalogAPI(client: self)
-
-    /// Collection management endpoints
-    ///
-    /// Manage personal card collections with full CRUD operations and analytics.
-    public lazy var collections = CollectionsAPI(client: self)
-
-    /// Collector management endpoints
-    ///
-    /// Manage collector profiles and user information.
-    public lazy var collectors = CollectorsAPI(client: self)
-
-    /// Lists management endpoints
-    ///
-    /// Create and manage wishlists of wanted cards.
-    public lazy var lists = ListsAPI(client: self)
-
-    /// Grading endpoints
-    ///
-    /// Access grading information for PSA, BGS, and SGC graded cards.
-    public lazy var grades = GradesAPI(client: self)
-
-    /// Autocomplete endpoints
-    ///
-    /// Get search suggestions for players, teams, sets, and more.
-    public lazy var autocomplete = AutocompleteAPI(client: self)
-
-    /// AI query endpoints
-    ///
-    /// Perform natural language queries powered by AI.
-    public lazy var ai = AIAPI(client: self)
-
-    /// Image retrieval endpoints
-    ///
-    /// Retrieve card images as platform-native types (UIImage/NSImage).
-    public lazy var images = ImagesAPI(client: self)
-
-    /// Feedback endpoints
-    ///
-    /// Submit feedback on card identifications and search results.
-    public lazy var feedback = FeedbackAPI(client: self)
-
-    /// Subscription endpoints
-    ///
-    /// Manage subscription status and billing information.
-    public lazy var subscription = SubscriptionAPI(client: self)
 
     /// Initialize the CardSightAI client with a configuration object.
     ///
@@ -210,9 +150,47 @@ public class CardSightAI {
         try self.init(config: config)
     }
 
-    /// Get the underlying OpenAPI client for advanced use cases
+    // MARK: - Convenience Methods
+
+    /// Perform a basic health check without authentication
+    /// - Returns: Health check response
+    public func getHealth() async throws -> Operations.getHealth.Output {
+        try await client.getHealth()
+    }
+
+    /// Perform an authenticated health check
+    /// - Returns: Health check response with authentication confirmation
+    public func getHealthAuthenticated() async throws -> Operations.getHealthAuthenticated.Output {
+        try await client.getHealthAuthenticated()
+    }
+
+    // MARK: - Raw Client Access
+
+    /// Direct access to the auto-generated OpenAPI client
+    ///
+    /// Use this to call any API endpoint directly with clean, type-safe methods.
+    ///
+    /// # Example
+    /// ```swift
+    /// // Catalog operations
+    /// let cards = try await client.getCards(query: .init(search: "Bonds"))
+    /// let sets = try await client.getSets(query: .init(year: 1989))
+    ///
+    /// // Collection operations
+    /// let collections = try await client.getCollections()
+    /// let newCollection = try await client.createCollection(body: .json(...))
+    ///
+    /// // Grading operations
+    /// let companies = try await client.getGradingCompanies()
+    /// ```
+    ///
+    /// All 79 API operations are available as methods on this client with clean names like:
+    /// - `getCards`, `getCard`, `getSets`, `getReleases`
+    /// - `getCollections`, `createCollection`, `updateCollection`
+    /// - `getGradingCompanies`, `getGradingTypes`, `getGrades`
+    /// - And many more...
     public var raw: Client {
-        return client
+        client
     }
 }
 
@@ -252,70 +230,7 @@ private struct TimeoutMiddleware: ClientMiddleware {
     }
 }
 
-// MARK: - API Endpoint Groups
-
-/// Health check API endpoints for testing connectivity and authentication.
-///
-/// Use these endpoints to validate your API configuration and connectivity
-/// before making actual API calls.
-public class HealthAPI {
-    private weak var client: CardSightAI?
-
-    init(client: CardSightAI) {
-        self.client = client
-    }
-
-    /// Perform a basic health check without authentication.
-    ///
-    /// This endpoint checks basic API connectivity without requiring a valid API key.
-    /// Useful for verifying that the API is reachable from your environment.
-    ///
-    /// - Returns: Health check response containing API status
-    /// - Throws: ``CardSightAIError/networkError(_:)`` if unable to reach the API
-    /// - Throws: ``CardSightAIError/apiError(statusCode:message:response:)`` if the API returns an error
-    ///
-    /// # Example
-    /// ```swift
-    /// let health = try await client.health.check()
-    /// print("API status: \(health.status)")
-    /// ```
-    ///
-    /// - Note: This endpoint does not validate your API key
-    public func check() async throws -> Operations.get_sol_health.Output {
-        guard let client = client else {
-            throw CardSightAIError.unknown("Client has been deallocated")
-        }
-        return try await client.raw.get_sol_health()
-    }
-
-    /// Perform an authenticated health check.
-    ///
-    /// This endpoint validates both API connectivity and your API key.
-    /// Use this to verify your API key is valid and has proper permissions.
-    ///
-    /// - Returns: Health check response with authentication confirmation
-    /// - Throws: ``CardSightAIError/authenticationError(_:)`` if API key is invalid
-    /// - Throws: ``CardSightAIError/networkError(_:)`` if unable to reach the API
-    /// - Throws: ``CardSightAIError/apiError(statusCode:message:response:)`` if the API returns an error
-    ///
-    /// # Example
-    /// ```swift
-    /// do {
-    ///     let health = try await client.health.checkAuth()
-    ///     print("✅ API key is valid")
-    /// } catch let error as CardSightAIError {
-    ///     if error.isAuthenticationError {
-    ///         print("❌ Invalid API key")
-    ///     }
-    /// }
-    /// ```
-    public func checkAuth() async throws -> Operations.get_sol_health_sol_auth.Output {
-        guard let client = client else {
-            throw CardSightAIError.unknown("Client has been deallocated")
-        }
-        return try await client.raw.get_sol_health_sol_auth()
-    }
-}
+// MARK: - Identify API Helper
 
 /// Card identification API endpoints for AI-powered card recognition.
 ///
@@ -380,7 +295,7 @@ public class IdentifyAPI {
     /// - Note: When optimized is true, images are resized so the smallest dimension is 900px with 80% JPEG quality.
     ///   When optimized is false but autoProcessImages is enabled, images are resized to maximum 2048x2048 pixels.
     ///   Configure ``ImageProcessingOptions`` in ``CardSightAIConfig`` to customize non-optimized processing.
-    public func card(_ image: UIImage, optimized: Bool = true) async throws -> Operations.post_sol_v1_sol_identify_sol_card.Output {
+    public func card(_ image: UIImage, optimized: Bool = true) async throws -> Operations.identifyCard.Output {
         guard let client = client else {
             throw CardSightAIError.unknown("Client has been deallocated")
         }
@@ -412,7 +327,7 @@ public class IdentifyAPI {
     /// - Throws: ``CardSightAIError/imageProcessingError(_:)`` if image processing fails
     /// - Throws: ``CardSightAIError/networkError(_:)`` if upload fails
     /// - Throws: ``CardSightAIError/apiError(statusCode:message:response:)`` if identification fails
-    public func card(_ image: NSImage, optimized: Bool = true) async throws -> Operations.post_sol_v1_sol_identify_sol_card.Output {
+    public func card(_ image: NSImage, optimized: Bool = true) async throws -> Operations.identifyCard.Output {
         guard let client = client else {
             throw CardSightAIError.unknown("Client has been deallocated")
         }
@@ -445,7 +360,7 @@ public class IdentifyAPI {
     /// - Throws: ``CardSightAIError/imageProcessingError(_:)`` if image processing fails
     /// - Throws: ``CardSightAIError/networkError(_:)`` if upload fails
     /// - Throws: ``CardSightAIError/apiError(statusCode:message:response:)`` if identification fails
-    public func card(_ imageData: Data, optimized: Bool = true) async throws -> Operations.post_sol_v1_sol_identify_sol_card.Output {
+    public func card(_ imageData: Data, optimized: Bool = true) async throws -> Operations.identifyCard.Output {
         guard let client = client else {
             throw CardSightAIError.unknown("Client has been deallocated")
         }
@@ -472,7 +387,7 @@ public class IdentifyAPI {
     /// - Throws: ``CardSightAIError/imageProcessingError(_:)`` if image processing fails
     /// - Throws: ``CardSightAIError/networkError(_:)`` if upload fails
     /// - Throws: ``CardSightAIError/apiError(statusCode:message:response:)`` if identification fails
-    public func card(_ url: URL, optimized: Bool = true) async throws -> Operations.post_sol_v1_sol_identify_sol_card.Output {
+    public func card(_ url: URL, optimized: Bool = true) async throws -> Operations.identifyCard.Output {
         guard let client = client else {
             throw CardSightAIError.unknown("Client has been deallocated")
         }
@@ -490,64 +405,18 @@ public class IdentifyAPI {
         return try await cardFromData(imageData)
     }
 
-    private func cardFromData(_ imageData: Data) async throws -> Operations.post_sol_v1_sol_identify_sol_card.Output {
+    private func cardFromData(_ imageData: Data) async throws -> Operations.identifyCard.Output {
         guard let client = client else {
             throw CardSightAIError.unknown("Client has been deallocated")
         }
 
-        // Manual multipart form-data implementation required because the OpenAPI spec
-        // doesn't include the request body schema for the identify endpoint.
-        // We bypass the generated client and use URLSession directly.
+        // Use the generated client with proper image body support
+        // The OpenAPI spec now properly defines the request body schema
+        let httpBody = HTTPBody(imageData)
+        let input = Operations.identifyCard.Input(
+            body: .jpeg(httpBody)
+        )
 
-        // Build multipart form-data body
-        let boundary = "Boundary-\(UUID().uuidString)"
-        var body = Data()
-
-        // Add form field for image
-        body.append("--\(boundary)\r\n".data(using: .utf8)!)
-        body.append("Content-Disposition: form-data; name=\"image\"; filename=\"card.jpg\"\r\n".data(using: .utf8)!)
-        body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
-        body.append(imageData)
-        body.append("\r\n".data(using: .utf8)!)
-        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
-
-        // Create custom request using URLSession directly
-        guard let url = URL(string: "\(client.config.baseURL)/v1/identify/card") else {
-            throw CardSightAIError.invalidInput("Invalid URL")
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue(client.config.apiKey, forHTTPHeaderField: "X-API-Key")
-        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-        request.httpBody = body
-        request.timeoutInterval = client.config.timeout
-
-        // Execute request
-        let (data, response) = try await URLSession.shared.data(for: request)
-
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw CardSightAIError.networkError(NSError(domain: "CardSightAI", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid response type"]))
-        }
-
-        // Handle HTTP errors
-        guard (200...299).contains(httpResponse.statusCode) else {
-            let errorMessage = String(data: data, encoding: .utf8) ?? "Unknown error"
-            throw CardSightAIError.apiError(statusCode: httpResponse.statusCode, message: errorMessage, response: data)
-        }
-
-        // Decode response
-        let decoder = JSONDecoder()
-        do {
-            let identifyResponse = try decoder.decode(Operations.post_sol_v1_sol_identify_sol_card.Output.Ok.Body.jsonPayload.self, from: data)
-            return .ok(.init(body: .json(identifyResponse)))
-        } catch {
-            throw CardSightAIError.decodingError(error)
-        }
+        return try await client.raw.identifyCard(input)
     }
 }
-
-// All API implementations are in API/ directory
-// CatalogAPI: API/CatalogAPI.swift
-// CollectionsAPI: API/CollectionsAPI.swift
-// All remaining APIs: API/RemainingAPIs.swift

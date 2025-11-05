@@ -5,7 +5,112 @@ All notable changes to the CardSight AI Swift SDK will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.3.0] - 2025-10-26
+## [2.0.0] - 2025-11-04
+
+### Breaking Changes
+
+**Major SDK Architecture Simplification** - This release removes the wrapper layer and provides direct access to the auto-generated OpenAPI client, resulting in a cleaner, more maintainable SDK.
+
+#### What Changed
+- **Removed all API wrapper classes** - The `Sources/CardSightAI/API/` directory has been deleted
+- **Direct client access required** - All operations (except card identification) now accessed via `client.raw.{operationName}()`
+- **Clean operation names** - Updated OpenAPI spec provides clean method names like `getCards()`, `createCollection()`, `getGradingCompanies()`
+
+#### Migration Guide
+
+**Before (v1.x):**
+```swift
+// Catalog operations
+let cards = try await client.catalog.cards.list(query: query)
+let card = try await client.catalog.cards.get(id: "card_uuid")
+
+// Collection operations
+let collection = try await client.collections.create(name: "My Cards", ...)
+let analytics = try await client.collections.analytics(collectionId: id)
+
+// Grades
+let companies = try await client.grades.companies()
+```
+
+**After (v2.0):**
+```swift
+// Catalog operations
+let cards = try await client.raw.getCards(query: query)
+let card = try await client.raw.getCard(.init(path: .init(id: "card_uuid")))
+
+// Collection operations
+let input = Operations.createCollection.Input(body: .json(.init(name: "My Cards", ...)))
+let collection = try await client.raw.createCollection(input)
+let analytics = try await client.raw.getCollectionAnalytics(.init(path: .init(collectionId: id)))
+
+// Grades
+let companies = try await client.raw.getGradingCompanies()
+```
+
+**Card identification remains unchanged:**
+```swift
+// Still works the same in v2.0
+let result = try await client.identify.card(image)
+```
+
+**Health checks now have shortcuts:**
+```swift
+// New convenience methods on main client
+let health = try await client.getHealth()
+let authHealth = try await client.getHealthAuthenticated()
+
+// Or use the raw client
+let health = try await client.raw.getHealth()
+```
+
+### Added
+- **Random Catalog Endpoints**: Three new endpoints for pack opening simulations and discovery features (79 total endpoints)
+  - `client.raw.getRandomReleases(query:)` - Get random releases matching filters
+  - `client.raw.getRandomSets(query:)` - Get random sets matching filters
+  - `client.raw.getRandomCards(query:)` - Get random cards with optional parallel odds system
+- **Parallel Odds System**: Cards random endpoint includes sophisticated parallel conversion
+  - Enable with `includeParallels=true` query parameter
+  - Simulates pack opening with weighted probability for numbered parallels (/1, /10, /99, etc.)
+  - Collective roll for unlimited parallels (Refractor, Rainbow, etc.)
+  - Returns `isParallel`, `parallelId`, `parallelName`, and `numberedTo` fields for parallel cards
+- Convenience methods `getHealth()` and `getHealthAuthenticated()` on main `CardSightAI` client
+
+### Changed
+- **All catalog, collection, grade, list, autocomplete, AI, image, feedback, and subscription operations** now accessed via `client.raw.{operationName}()`
+- OpenAPI specification updated with proper `operationId` values for clean method names
+- Reduced SDK complexity by hundreds of lines of wrapper code
+- Updated all documentation and examples to reflect new API patterns
+
+### Removed
+- `CatalogAPI` wrapper class and all sub-classes (`CardsAPI`, `SetsAPI`, `ReleasesAPI`)
+- `CollectionsAPI` wrapper class and `CollectionCardsAPI` sub-class
+- `CollectorsAPI` wrapper class
+- `ListsAPI` wrapper class and `ListCardsAPI` sub-class
+- `GradesAPI` wrapper class
+- `AutocompleteAPI` wrapper class
+- `AIAPI` wrapper class
+- `ImagesAPI` wrapper class
+- `FeedbackAPI` wrapper class
+- `SubscriptionAPI` wrapper class
+- `HealthAPI` wrapper class (replaced with convenience methods on main client)
+
+### Technical Details
+- Entire `Sources/CardSightAI/API/` directory removed
+- `IdentifyAPI` retained as the only wrapper (provides image processing before API calls)
+- All operation names cleaned up in OpenAPI spec (e.g., `get_sol_v1_sol_catalog_sol_cards` → `getCards`)
+- SDK now leverages Swift OpenAPI Generator's clean, type-safe client directly
+- Improved maintainability - API changes no longer require manual wrapper updates
+
+### Benefits
+- **Simpler architecture** - Direct access to auto-generated operations
+- **Better type safety** - Use generated `Operations.{operationId}.Input` types directly
+- **Easier maintenance** - No wrapper layer to keep in sync with API changes
+- **Transparent API** - Clear mapping between SDK calls and REST endpoints
+- **Smaller codebase** - Hundreds of lines of redundant code eliminated
+
+## [1.3.0] - 2025-10-26 [DEPRECATED]
+
+**Note**: This version was never released. Changes merged into v2.0.0.
 
 ### Added
 - **Random Catalog Endpoints**: Three new endpoints for pack opening simulations and discovery features
@@ -130,6 +235,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Manual image upload for collection cards (OpenAPI schema limitation)
 - Platform-specific binary image retrieval (OpenAPI schema limitation)
 
-[Unreleased]: https://github.com/cardsightai/cardsightai-sdk-swift/compare/v1.1.0...HEAD
+[2.0.0]: https://github.com/cardsightai/cardsightai-sdk-swift/compare/v1.2.0...v2.0.0
+[1.2.0]: https://github.com/cardsightai/cardsightai-sdk-swift/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/cardsightai/cardsightai-sdk-swift/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/cardsightai/cardsightai-sdk-swift/releases/tag/v1.0.0
