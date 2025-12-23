@@ -410,12 +410,18 @@ public class IdentifyAPI {
             throw CardSightAIError.unknown("Client has been deallocated")
         }
 
-        // Create multipart/form-data body
-        // The API requires multipart form-data with an "image" field
+        // Create multipart/form-data body with proper headers
+        // The API requires multipart form-data with an "image" field and Content-Type header
         let httpBody = HTTPBody(imageData)
-        let imagePayload = Components.Schemas.FileUploadInput.imagePayload(body: httpBody)
-        let imagePart = MultipartPart(payload: imagePayload, filename: "image.jpg")
-        let multipartBody: MultipartBody<Components.Schemas.FileUploadInput> = [.image(imagePart)]
+
+        // Build headers for the multipart part
+        var headerFields = HTTPFields()
+        headerFields[.contentDisposition] = #"form-data; name="image"; filename="image.jpg""#
+        headerFields[.contentType] = "image/jpeg"
+
+        // Create raw multipart part with headers
+        let rawPart = MultipartRawPart(headerFields: headerFields, body: httpBody)
+        let multipartBody: MultipartBody<Components.Schemas.FileUploadInput> = [.undocumented(rawPart)]
 
         let input = Operations.identifyCard.Input(
             body: .multipartForm(multipartBody)
