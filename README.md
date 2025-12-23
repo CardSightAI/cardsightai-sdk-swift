@@ -51,7 +51,7 @@ Add the following to your `Package.swift` file:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/cardsightai/cardsightai-sdk-swift.git", from: "2.0.1")
+    .package(url: "https://github.com/cardsightai/cardsightai-sdk-swift.git", from: "2.1.0")
 ]
 ```
 
