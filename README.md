@@ -51,7 +51,7 @@ Add the following to your `Package.swift` file:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/cardsightai/cardsightai-sdk-swift.git", from: "2.1.0")
+    .package(url: "https://github.com/cardsightai/cardsightai-sdk-swift.git", from: "2.1.2")
 ]
 ```
 
@@ -657,20 +657,6 @@ let config = try CardSightAIConfig(
     )
 )
 let client = try CardSightAI(config: config)
-```
-
-#### Ugly Auto-Generated Type Names
-
-**Problem**: Working with types like `Operations.get_sol_v1_sol_catalog_sol_cards` is cumbersome
-**Explanation**: These are auto-generated from the OpenAPI specification and reflect the API's internal structure
-**Recommendation**: Use the convenience properties on the client which provide cleaner interfaces:
-
-```swift
-// Instead of using Operations types directly:
-// var query = Operations.get_sol_v1_sol_catalog_sol_cards.Input.Query()
-
-// Use the client's methods which hide the complexity:
-let cards = try await client.catalog.cards.list(query: query)
 ```
 
 ### Getting Help

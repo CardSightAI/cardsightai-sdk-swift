@@ -410,11 +410,15 @@ public class IdentifyAPI {
             throw CardSightAIError.unknown("Client has been deallocated")
         }
 
-        // Use the generated client with proper image body support
-        // The OpenAPI spec now properly defines the request body schema
+        // Create multipart/form-data body
+        // The API requires multipart form-data with an "image" field
         let httpBody = HTTPBody(imageData)
+        let imagePayload = Components.Schemas.FileUploadInput.imagePayload(body: httpBody)
+        let imagePart = MultipartPart(payload: imagePayload, filename: "image.jpg")
+        let multipartBody: MultipartBody<Components.Schemas.FileUploadInput> = [.image(imagePart)]
+
         let input = Operations.identifyCard.Input(
-            body: .jpeg(httpBody)
+            body: .multipartForm(multipartBody)
         )
 
         return try await client.raw.identifyCard(input)
