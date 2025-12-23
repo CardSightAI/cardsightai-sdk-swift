@@ -5,6 +5,22 @@ All notable changes to the CardSight AI Swift SDK will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1] - 2025-12-22
+
+### Fixed
+- **Forward-Compatibility for Card Identification**: Added automated OpenAPI spec patching to prevent decode errors when the API returns new fields
+  - Resolves `DecodingError.dataCorrupted` errors caused by `additionalProperties: false` constraints on identification schemas
+  - SDK now gracefully ignores unknown fields in API responses for identification endpoints
+
+### Added
+- **OpenAPI Spec Patching Script**: New `Scripts/patch-openapi-spec.py` automatically patches identification schemas during `make update-spec`
+  - Follows [Apple's official recommendation](https://github.com/apple/swift-openapi-generator/issues/608) for handling forward-compatibility with swift-openapi-generator
+  - Patches `AIIdentificationInput`, `IdentificationDataInput`, `CardDetailsInput`, and `IdentifyCardResponseInput` schemas
+- **Documentation**: Added "OpenAPI Spec Patching" section to README explaining the patching process and rationale
+
+### Changed
+- `make update-spec` now automatically runs the patch script after fetching the OpenAPI specification
+
 ## [2.0.0] - 2025-11-04
 
 ### Breaking Changes
@@ -235,6 +251,7 @@ let health = try await client.raw.getHealth()
 - Manual image upload for collection cards (OpenAPI schema limitation)
 - Platform-specific binary image retrieval (OpenAPI schema limitation)
 
+[2.0.1]: https://github.com/cardsightai/cardsightai-sdk-swift/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/cardsightai/cardsightai-sdk-swift/compare/v1.2.0...v2.0.0
 [1.2.0]: https://github.com/cardsightai/cardsightai-sdk-swift/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/cardsightai/cardsightai-sdk-swift/compare/v1.0.0...v1.1.0

@@ -51,7 +51,7 @@ Add the following to your `Package.swift` file:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/cardsightai/cardsightai-sdk-swift.git", from: "2.0.0")
+    .package(url: "https://github.com/cardsightai/cardsightai-sdk-swift.git", from: "2.0.1")
 ]
 ```
 
@@ -476,6 +476,27 @@ make build
 # Run tests (requires Xcode, not just Command Line Tools)
 make test
 ```
+
+## OpenAPI Spec Patching
+
+When updating the OpenAPI specification (`make update-spec`), a post-processing script automatically patches certain schemas for forward-compatibility.
+
+### Why This Is Needed
+
+Apple's [swift-openapi-generator](https://github.com/apple/swift-openapi-generator) strictly enforces `additionalProperties: false` constraints from the OpenAPI spec. When the CardSight API returns new fields not yet documented in the spec, this causes decoding failures.
+
+The maintainers of swift-openapi-generator [officially recommend](https://github.com/apple/swift-openapi-generator/issues/608) preprocessing the OpenAPI document to handle forward-compatibility.
+
+### What Gets Patched
+
+The `Scripts/patch-openapi-spec.py` script removes `additionalProperties: false` from identification-related schemas:
+
+- `AIIdentificationInput`
+- `IdentificationDataInput`
+- `CardDetailsInput`
+- `IdentifyCardResponseInput`
+
+This allows the SDK to gracefully ignore unknown fields in API responses, preventing decode errors when the API evolves.
 
 ## Testing
 

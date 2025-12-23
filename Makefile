@@ -4,6 +4,8 @@
 update-spec:
 	@echo "Fetching latest OpenAPI specification..."
 	@curl -s https://api.cardsight.ai/documentation/json | python3 -m json.tool > Sources/CardSightAI/openapi.json
+	@echo "Patching spec for forward-compatibility..."
+	@python3 Scripts/patch-openapi-spec.py Sources/CardSightAI/openapi.json
 	@echo "OpenAPI specification updated successfully!"
 
 # Build the Swift package

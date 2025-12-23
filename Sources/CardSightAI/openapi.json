@@ -1,7 +1,7 @@
 {
     "openapi": "3.1.0",
     "info": {
-        "title": "CardSightAI Edge API",
+        "title": "CardSightAI API",
         "description": "High-performance API service for CardSightAI",
         "version": "1.0.0"
     },
@@ -15,8 +15,6 @@
         },
         "schemas": {
             "ErrorResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/ErrorResponseInput",
                 "type": "object",
                 "properties": {
                     "error": {
@@ -34,8 +32,6 @@
                 ]
             },
             "BatchOperationErrorInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/BatchOperationErrorInput",
                 "type": "object",
                 "properties": {
                     "index": {
@@ -59,8 +55,6 @@
                 ]
             },
             "CreateListInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CreateListInput",
                 "type": "object",
                 "properties": {
                     "collectorId": {
@@ -82,8 +76,6 @@
                 ]
             },
             "UpdateListInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/UpdateListInput",
                 "type": "object",
                 "properties": {
                     "name": {
@@ -97,8 +89,6 @@
                 }
             },
             "ListCardItemInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/ListCardItemInput",
                 "type": "object",
                 "properties": {
                     "cardId": {
@@ -112,8 +102,6 @@
                 ]
             },
             "AddCardToListInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/AddCardToListInput",
                 "anyOf": [
                     {
                         "$ref": "#/components/schemas/ListCardItemInput"
@@ -130,8 +118,6 @@
                 ]
             },
             "ListInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/ListInput",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -159,8 +145,6 @@
                 ]
             },
             "ListCardInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/ListCardInput",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -185,8 +169,6 @@
                 ]
             },
             "PaginatedListsResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/PaginatedListsResponseInput",
                 "type": "object",
                 "properties": {
                     "lists": {
@@ -217,8 +199,6 @@
                 ]
             },
             "PaginatedListCardsResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/PaginatedListCardsResponseInput",
                 "type": "object",
                 "properties": {
                     "cards": {
@@ -249,8 +229,6 @@
                 ]
             },
             "BatchListCardsResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/BatchListCardsResponseInput",
                 "type": "object",
                 "properties": {
                     "cards": {
@@ -273,8 +251,6 @@
                 ]
             },
             "AddCardsToListResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/AddCardsToListResponseInput",
                 "anyOf": [
                     {
                         "$ref": "#/components/schemas/ListCardInput"
@@ -285,8 +261,6 @@
                 ]
             },
             "CreateCollectorInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CreateCollectorInput",
                 "type": "object",
                 "properties": {
                     "name": {
@@ -296,8 +270,6 @@
                 }
             },
             "UpdateCollectorInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/UpdateCollectorInput",
                 "type": "object",
                 "properties": {
                     "name": {
@@ -307,8 +279,6 @@
                 }
             },
             "CollectorInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CollectorInput",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -326,8 +296,6 @@
                 ]
             },
             "PaginatedCollectorsResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/PaginatedCollectorsResponseInput",
                 "type": "object",
                 "properties": {
                     "collectors": {
@@ -354,8 +322,6 @@
                 ]
             },
             "CreateCollectionInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CreateCollectionInput",
                 "type": "object",
                 "properties": {
                     "collectorId": {
@@ -378,8 +344,6 @@
                 ]
             },
             "UpdateCollectionInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/UpdateCollectionInput",
                 "type": "object",
                 "properties": {
                     "name": {
@@ -393,8 +357,6 @@
                 }
             },
             "CollectionCardItemInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CollectionCardItemInput",
                 "type": "object",
                 "properties": {
                     "cardId": {
@@ -449,8 +411,6 @@
                 ]
             },
             "CreateCollectionCardInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CreateCollectionCardInput",
                 "anyOf": [
                     {
                         "$ref": "#/components/schemas/CollectionCardItemInput"
@@ -467,8 +427,6 @@
                 ]
             },
             "UpdateCollectionCardInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/UpdateCollectionCardInput",
                 "type": "object",
                 "properties": {
                     "parallelId": {
@@ -562,8 +520,6 @@
                 }
             },
             "CollectionInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CollectionInput",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -591,8 +547,6 @@
                 ]
             },
             "CollectionCardInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CollectionCardInput",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -659,8 +613,6 @@
                 ]
             },
             "PaginatedCollectionsResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/PaginatedCollectionsResponseInput",
                 "type": "object",
                 "properties": {
                     "collections": {
@@ -687,8 +639,6 @@
                 ]
             },
             "PaginatedCollectionCardsResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/PaginatedCollectionCardsResponseInput",
                 "type": "object",
                 "properties": {
                     "cards": {
@@ -715,8 +665,6 @@
                 ]
             },
             "BatchCollectionCardsResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/BatchCollectionCardsResponseInput",
                 "type": "object",
                 "properties": {
                     "cards": {
@@ -739,8 +687,6 @@
                 ]
             },
             "AddCollectionCardsResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/AddCollectionCardsResponseInput",
                 "anyOf": [
                     {
                         "$ref": "#/components/schemas/CollectionCardInput"
@@ -751,8 +697,6 @@
                 ]
             },
             "TopCardInGroupInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/TopCardInGroupInput",
                 "type": "object",
                 "properties": {
                     "cardId": {
@@ -798,8 +742,6 @@
                 ]
             },
             "MostValuableGroupInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/MostValuableGroupInput",
                 "type": "object",
                 "properties": {
                     "name": {
@@ -817,8 +759,6 @@
                 ]
             },
             "BestPerformingGroupInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/BestPerformingGroupInput",
                 "type": "object",
                 "properties": {
                     "name": {
@@ -836,8 +776,6 @@
                 ]
             },
             "CollectionBreakdownSummaryInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CollectionBreakdownSummaryInput",
                 "type": "object",
                 "properties": {
                     "totalGroups": {
@@ -885,8 +823,6 @@
                 ]
             },
             "BreakdownPaginationInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/BreakdownPaginationInput",
                 "type": "object",
                 "properties": {
                     "total_count": {
@@ -919,8 +855,6 @@
                 ]
             },
             "BreakdownGroupInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/BreakdownGroupInput",
                 "type": "object",
                 "properties": {
                     "groupKey": {
@@ -988,8 +922,6 @@
                 ]
             },
             "CollectionBreakdownResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CollectionBreakdownResponseInput",
                 "type": "object",
                 "properties": {
                     "summary": {
@@ -1015,8 +947,6 @@
                 ]
             },
             "SetProgressInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/SetProgressInput",
                 "type": "object",
                 "properties": {
                     "setId": {
@@ -1079,8 +1009,6 @@
                 ]
             },
             "SetProgressSummaryInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/SetProgressSummaryInput",
                 "type": "object",
                 "properties": {
                     "totalSets": {
@@ -1107,8 +1035,6 @@
                 ]
             },
             "SetProgressListResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/SetProgressListResponseInput",
                 "type": "object",
                 "properties": {
                     "summary": {
@@ -1144,8 +1070,6 @@
                 ]
             },
             "ParallelSetProgressInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/ParallelSetProgressInput",
                 "type": "object",
                 "properties": {
                     "setId": {
@@ -1214,8 +1138,6 @@
                 ]
             },
             "CollectionOverviewInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CollectionOverviewInput",
                 "type": "object",
                 "properties": {
                     "totalCards": {
@@ -1238,8 +1160,6 @@
                 ]
             },
             "CollectionFinancialsInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CollectionFinancialsInput",
                 "type": "object",
                 "properties": {
                     "totalInvested": {
@@ -1269,8 +1189,6 @@
                 }
             },
             "CollectionCompositionInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CollectionCompositionInput",
                 "type": "object",
                 "properties": {
                     "gradedCount": {
@@ -1303,8 +1221,6 @@
                 ]
             },
             "TopGainerCardInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/TopGainerCardInput",
                 "type": "object",
                 "properties": {
                     "cardId": {
@@ -1352,8 +1268,6 @@
                 ]
             },
             "TopValueCardInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/TopValueCardInput",
                 "type": "object",
                 "properties": {
                     "cardId": {
@@ -1391,8 +1305,6 @@
                 ]
             },
             "CollectionPerformanceInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CollectionPerformanceInput",
                 "type": "object",
                 "properties": {
                     "averageCardValue": {
@@ -1414,8 +1326,6 @@
                 }
             },
             "CollectionAnalyticsResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CollectionAnalyticsResponseInput",
                 "type": "object",
                 "properties": {
                     "overview": {
@@ -1443,8 +1353,6 @@
                 ]
             },
             "UploadCollectionCardImageResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/UploadCollectionCardImageResponseInput",
                 "type": "object",
                 "properties": {
                     "imageId": {
@@ -1474,8 +1382,6 @@
                 ]
             },
             "CreateBinderInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CreateBinderInput",
                 "type": "object",
                 "properties": {
                     "name": {
@@ -1489,8 +1395,6 @@
                 }
             },
             "UpdateBinderInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/UpdateBinderInput",
                 "type": "object",
                 "properties": {
                     "name": {
@@ -1504,8 +1408,6 @@
                 }
             },
             "AddCardToBinderInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/AddCardToBinderInput",
                 "type": "object",
                 "properties": {
                     "collectionCardId": {
@@ -1520,8 +1422,6 @@
                 ]
             },
             "BinderInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/BinderInput",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -1551,8 +1451,6 @@
                 ]
             },
             "BinderCardInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/BinderCardInput",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -1581,8 +1479,6 @@
                 ]
             },
             "PaginatedBindersResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/PaginatedBindersResponseInput",
                 "type": "object",
                 "properties": {
                     "binders": {
@@ -1609,8 +1505,6 @@
                 ]
             },
             "PaginatedBinderCardsResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/PaginatedBinderCardsResponseInput",
                 "type": "object",
                 "properties": {
                     "cards": {
@@ -1637,8 +1531,6 @@
                 ]
             },
             "FeedbackInputInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/FeedbackInputInput",
                 "type": "object",
                 "properties": {
                     "feedback_type": {
@@ -1663,8 +1555,6 @@
                 ]
             },
             "FeedbackResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/FeedbackResponseInput",
                 "type": "object",
                 "properties": {
                     "unique_id": {
@@ -1750,8 +1640,6 @@
                 ]
             },
             "FeedbackSubmitResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/FeedbackSubmitResponseInput",
                 "type": "object",
                 "properties": {
                     "success": {
@@ -1771,11 +1659,11 @@
                 ]
             },
             "FileUploadInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/FileUploadInput",
                 "type": "object",
                 "properties": {
                     "image": {
+                        "type": "string",
+                        "format": "binary",
                         "description": "The image file to analyze"
                     }
                 },
@@ -1784,8 +1672,6 @@
                 ]
             },
             "AIIdentificationInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/AIIdentificationInput",
                 "type": "object",
                 "properties": {
                     "year": {
@@ -1801,7 +1687,7 @@
                         "type": "string"
                     },
                     "name": {
-                        "description": "Player or subject name on the card (e.g., \"Michael Jordan\", \"Tom Brady\")",
+                        "description": "Player or subject name on the card, if identified (e.g., \"Michael Jordan\", \"Tom Brady\")",
                         "type": "string"
                     },
                     "number": {
@@ -1811,13 +1697,10 @@
                 },
                 "required": [
                     "year",
-                    "release",
-                    "name"
+                    "release"
                 ]
             },
             "CardDetailsInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CardDetailsInput",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -1847,6 +1730,33 @@
                     "number": {
                         "description": "Card number from catalog (e.g., \"#23\", \"RC-1\")",
                         "type": "string"
+                    },
+                    "parallel": {
+                        "description": "Parallel variant information if this card is identified as a parallel (e.g., refractor, numbered, color variant)",
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "description": "Unique identifier for the parallel type. Format: UUID v4. This ID represents the parallel variant, not individual cards.",
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                            },
+                            "name": {
+                                "description": "Name of the parallel variant. Examples: \"Gold Refractor\", \"Black Prizm\", \"Orange\". Describes the visual variant or rarity tier.",
+                                "type": "string"
+                            },
+                            "description": {
+                                "description": "Additional details about the parallel such as print run, special features, or visual description. May be null.",
+                                "type": "string"
+                            },
+                            "numberedTo": {
+                                "description": "Limited print run number for this parallel",
+                                "type": "number"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name"
+                        ]
                     }
                 },
                 "required": [
@@ -1858,12 +1768,10 @@
                 ]
             },
             "IdentificationDataInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/IdentificationDataInput",
                 "type": "object",
                 "properties": {
                     "confidence": {
-                        "description": "AI confidence level for this detection (High: 90-100%, Medium: 70-89%, Low: <70%)",
+                        "description": "AI confidence level for this detection (High: 90-100%, Medium: 75-89%, Low: 50-74%)",
                         "type": "string",
                         "enum": [
                             "High",
@@ -1871,18 +1779,21 @@
                             "Low"
                         ]
                     },
+                    "aiIdentification": {
+                        "description": "Raw AI identification result - always present. Contains year, release, and optionally set, name, number.",
+                        "$ref": "#/components/schemas/AIIdentificationInput"
+                    },
                     "card": {
-                        "description": "Matched card details from catalog. Null if no match found or confidence too low.",
+                        "description": "Matched card details from catalog. Absent if no exact match found (partial identification).",
                         "$ref": "#/components/schemas/CardDetailsInput"
                     }
                 },
                 "required": [
-                    "confidence"
+                    "confidence",
+                    "aiIdentification"
                 ]
             },
             "IdentifyCardResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/IdentifyCardResponseInput",
                 "type": "object",
                 "properties": {
                     "success": {
@@ -1911,8 +1822,6 @@
                 ]
             },
             "AIQueryRequestInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/AIQueryRequestInput",
                 "type": "object",
                 "properties": {
                     "query": {
@@ -1945,8 +1854,6 @@
                 ]
             },
             "AIContextInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/AIContextInput",
                 "type": "object",
                 "properties": {
                     "collectionId": {
@@ -1961,8 +1868,6 @@
                 "additionalProperties": {}
             },
             "ConversationMessageInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/ConversationMessageInput",
                 "type": "object",
                 "properties": {
                     "role": {
@@ -1986,8 +1891,6 @@
                 ]
             },
             "AIQueryResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/AIQueryResponseInput",
                 "type": "object",
                 "properties": {
                     "answer": {
@@ -2012,8 +1915,6 @@
                 ]
             },
             "AIErrorInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/AIErrorInput",
                 "type": "object",
                 "properties": {
                     "error": {
@@ -2030,8 +1931,6 @@
                 ]
             },
             "ApiKeyUsageInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/ApiKeyUsageInput",
                 "type": "object",
                 "properties": {
                     "key": {
@@ -2051,8 +1950,6 @@
                 ]
             },
             "SubscriptionInfoInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/SubscriptionInfoInput",
                 "type": "object",
                 "properties": {
                     "calls": {
@@ -2075,8 +1972,6 @@
                 ]
             },
             "ImageJsonResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/ImageJsonResponseInput",
                 "type": "object",
                 "properties": {
                     "data": {
@@ -2098,8 +1993,6 @@
                 ]
             },
             "SegmentInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/SegmentInput",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -2118,8 +2011,6 @@
                 ]
             },
             "ManufacturerInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/ManufacturerInput",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -2142,8 +2033,6 @@
                 ]
             },
             "ReleaseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/ReleaseInput",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -2183,8 +2072,6 @@
                 ]
             },
             "SetInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/SetInput",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -2213,8 +2100,6 @@
                 ]
             },
             "CardInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CardInput",
                 "type": "object",
                 "properties": {
                     "releaseId": {
@@ -2253,8 +2138,6 @@
                 ]
             },
             "ParallelInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/ParallelInput",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -2283,8 +2166,6 @@
                 ]
             },
             "AttributeInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/AttributeInput",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -2312,8 +2193,6 @@
                 ]
             },
             "ParallelSummaryInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/ParallelSummaryInput",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -2358,8 +2237,6 @@
                 ]
             },
             "AttributeSummaryInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/DetailedAttributeResponseInput",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -2392,8 +2269,6 @@
                 ]
             },
             "ReleaseSummaryInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/ReleaseSummaryInput",
                 "type": "object",
                 "properties": {
                     "manufacturerId": {
@@ -2432,8 +2307,6 @@
                 ]
             },
             "SetSummaryWithCountsInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/SetSummaryWithCountsInput",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -2466,8 +2339,6 @@
                 ]
             },
             "CardSummaryInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CardSummaryInput",
                 "type": "object",
                 "properties": {
                     "releaseId": {
@@ -2544,8 +2415,6 @@
                 ]
             },
             "DetailedCardInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/DetailedCardResponseInput",
                 "type": "object",
                 "properties": {
                     "releaseId": {
@@ -2639,8 +2508,6 @@
                 ]
             },
             "ReleaseWithSetsInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/DetailedReleaseResponseInput",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -2688,8 +2555,6 @@
                 ]
             },
             "ParallelWithSetInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/ParallelWithSetInput",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -2766,8 +2631,6 @@
                 ]
             },
             "PaginatedSegmentsResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/PaginatedSegmentsResponseInput",
                 "type": "object",
                 "properties": {
                     "segments": {
@@ -2798,8 +2661,6 @@
                 ]
             },
             "PaginatedManufacturersResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/PaginatedManufacturersResponseInput",
                 "type": "object",
                 "properties": {
                     "manufacturers": {
@@ -2830,8 +2691,6 @@
                 ]
             },
             "PaginatedReleasesResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/PaginatedReleasesResponseInput",
                 "type": "object",
                 "properties": {
                     "releases": {
@@ -2862,8 +2721,6 @@
                 ]
             },
             "DetailedReleaseResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/DetailedReleaseResponseInput",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -2911,8 +2768,6 @@
                 ]
             },
             "PaginatedCardsResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/PaginatedCardsResponseInput",
                 "type": "object",
                 "properties": {
                     "cards": {
@@ -2943,8 +2798,6 @@
                 ]
             },
             "PaginatedSetsResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/PaginatedSetsResponseInput",
                 "type": "object",
                 "properties": {
                     "sets": {
@@ -3020,8 +2873,6 @@
                 ]
             },
             "DetailedSetResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/DetailedSetResponseInput",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -3078,8 +2929,6 @@
                 ]
             },
             "DetailedCardResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/DetailedCardResponseInput",
                 "type": "object",
                 "properties": {
                     "releaseId": {
@@ -3173,8 +3022,6 @@
                 ]
             },
             "PaginatedAttributesResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/PaginatedAttributesResponseInput",
                 "type": "object",
                 "properties": {
                     "attributes": {
@@ -3205,8 +3052,6 @@
                 ]
             },
             "DetailedAttributeResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/DetailedAttributeResponseInput",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -3239,8 +3084,6 @@
                 ]
             },
             "PaginatedParallelsResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/PaginatedParallelsResponseInput",
                 "type": "object",
                 "properties": {
                     "parallels": {
@@ -3271,10 +3114,14 @@
                 ]
             },
             "CatalogSegmentBreakdownItemInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CatalogSegmentBreakdownItemInput",
                 "type": "object",
                 "properties": {
+                    "id": {
+                        "description": "Segment unique identifier",
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
                     "name": {
                         "description": "Segment name",
                         "type": "string"
@@ -3285,13 +3132,12 @@
                     }
                 },
                 "required": [
+                    "id",
                     "name",
                     "count"
                 ]
             },
             "CatalogSegmentStatsInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CatalogSegmentStatsInput",
                 "type": "object",
                 "properties": {
                     "total": {
@@ -3312,10 +3158,14 @@
                 ]
             },
             "CatalogManufacturerBreakdownItemInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CatalogManufacturerBreakdownItemInput",
                 "type": "object",
                 "properties": {
+                    "id": {
+                        "description": "Manufacturer unique identifier",
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
                     "name": {
                         "description": "Manufacturer name",
                         "type": "string"
@@ -3326,13 +3176,12 @@
                     }
                 },
                 "required": [
+                    "id",
                     "name",
                     "releaseCount"
                 ]
             },
             "CatalogManufacturerStatsInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CatalogManufacturerStatsInput",
                 "type": "object",
                 "properties": {
                     "total": {
@@ -3353,8 +3202,6 @@
                 ]
             },
             "CatalogReleaseYearBreakdownInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CatalogReleaseYearBreakdownInput",
                 "type": "object",
                 "properties": {
                     "year": {
@@ -3372,8 +3219,6 @@
                 ]
             },
             "CatalogReleaseBySegmentInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CatalogReleaseBySegmentInput",
                 "type": "object",
                 "properties": {
                     "segmentName": {
@@ -3399,8 +3244,6 @@
                 ]
             },
             "CatalogReleaseStatsInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CatalogReleaseStatsInput",
                 "type": "object",
                 "properties": {
                     "total": {
@@ -3421,8 +3264,6 @@
                 ]
             },
             "CatalogSetStatsInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CatalogSetStatsInput",
                 "type": "object",
                 "properties": {
                     "total": {
@@ -3440,32 +3281,33 @@
                 ]
             },
             "CatalogCardStatsInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CatalogCardStatsInput",
                 "type": "object",
                 "properties": {
                     "total": {
-                        "description": "Total number of all cards in catalog",
+                        "description": "Total cards including all parallel versions",
                         "type": "number"
                     },
                     "base": {
-                        "description": "Count of base cards (original cards)",
+                        "description": "Base cards (non-parallel, non-variation)",
                         "type": "number"
                     },
                     "variations": {
-                        "description": "Count of card variations",
+                        "description": "Variation cards (non-parallel)",
+                        "type": "number"
+                    },
+                    "parallels": {
+                        "description": "Total parallel card instances",
                         "type": "number"
                     }
                 },
                 "required": [
                     "total",
                     "base",
-                    "variations"
+                    "variations",
+                    "parallels"
                 ]
             },
             "CatalogParallelStatsInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CatalogParallelStatsInput",
                 "type": "object",
                 "properties": {
                     "total": {
@@ -3488,8 +3330,6 @@
                 ]
             },
             "CatalogStatisticsResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CatalogStatisticsResponseInput",
                 "type": "object",
                 "properties": {
                     "segments": {
@@ -3527,8 +3367,6 @@
                 ]
             },
             "CardWithOptionalParallelInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CardWithOptionalParallelInput",
                 "type": "object",
                 "properties": {
                     "releaseId": {
@@ -3629,8 +3467,6 @@
                 ]
             },
             "RandomReleasesResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/RandomReleasesResponseInput",
                 "type": "object",
                 "properties": {
                     "releases": {
@@ -3651,8 +3487,6 @@
                 ]
             },
             "RandomSetsResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/RandomSetsResponseInput",
                 "type": "object",
                 "properties": {
                     "sets": {
@@ -3718,8 +3552,6 @@
                 ]
             },
             "RandomCardsResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/RandomCardsResponseInput",
                 "type": "object",
                 "properties": {
                     "cards": {
@@ -3740,8 +3572,6 @@
                 ]
             },
             "AutocompleteResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/AutocompleteResponseInput",
                 "type": "object",
                 "properties": {
                     "suggestions": {
@@ -3758,8 +3588,6 @@
                 ]
             },
             "GradingCompanyInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/GradingCompanyInput",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -3803,8 +3631,6 @@
                 ]
             },
             "GradingTypeInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/GradingTypeInput",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -3860,8 +3686,6 @@
                 ]
             },
             "GradeInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/GradeInput",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -3905,8 +3729,6 @@
                 ]
             },
             "GradingCompaniesResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/GradingCompaniesResponseInput",
                 "type": "object",
                 "properties": {
                     "companies": {
@@ -3927,8 +3749,6 @@
                 ]
             },
             "GradingTypesResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/GradingTypesResponseInput",
                 "type": "object",
                 "properties": {
                     "types": {
@@ -3954,8 +3774,6 @@
                 ]
             },
             "GradesResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/GradesResponseInput",
                 "type": "object",
                 "properties": {
                     "grades": {
@@ -3986,8 +3804,6 @@
                 ]
             },
             "BasicHealthResponseInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/BasicHealthResponseInput",
                 "type": "object",
                 "properties": {
                     "status": {
@@ -4005,8 +3821,6 @@
                 ]
             },
             "ErrorResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/ErrorResponse",
                 "type": "object",
                 "properties": {
                     "error": {
@@ -4025,8 +3839,6 @@
                 "additionalProperties": false
             },
             "BatchOperationError": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/BatchOperationError",
                 "type": "object",
                 "properties": {
                     "index": {
@@ -4051,8 +3863,6 @@
                 "additionalProperties": false
             },
             "CreateList": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CreateList",
                 "type": "object",
                 "properties": {
                     "collectorId": {
@@ -4075,8 +3885,6 @@
                 "additionalProperties": false
             },
             "UpdateList": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/UpdateList",
                 "type": "object",
                 "properties": {
                     "name": {
@@ -4091,8 +3899,6 @@
                 "additionalProperties": false
             },
             "ListCardItem": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/ListCardItem",
                 "type": "object",
                 "properties": {
                     "cardId": {
@@ -4107,8 +3913,6 @@
                 "additionalProperties": false
             },
             "AddCardToList": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/AddCardToList",
                 "anyOf": [
                     {
                         "$ref": "#/components/schemas/ListCardItem"
@@ -4125,8 +3929,6 @@
                 ]
             },
             "List": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/List",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -4155,8 +3957,6 @@
                 "additionalProperties": false
             },
             "ListCard": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/ListCard",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -4182,8 +3982,6 @@
                 "additionalProperties": false
             },
             "PaginatedListsResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/PaginatedListsResponse",
                 "type": "object",
                 "properties": {
                     "lists": {
@@ -4215,8 +4013,6 @@
                 "additionalProperties": false
             },
             "PaginatedListCardsResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/PaginatedListCardsResponse",
                 "type": "object",
                 "properties": {
                     "cards": {
@@ -4248,8 +4044,6 @@
                 "additionalProperties": false
             },
             "BatchListCardsResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/BatchListCardsResponse",
                 "type": "object",
                 "properties": {
                     "cards": {
@@ -4273,8 +4067,6 @@
                 "additionalProperties": false
             },
             "AddCardsToListResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/AddCardsToListResponse",
                 "anyOf": [
                     {
                         "$ref": "#/components/schemas/ListCard"
@@ -4285,8 +4077,6 @@
                 ]
             },
             "CreateCollector": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CreateCollector",
                 "type": "object",
                 "properties": {
                     "name": {
@@ -4297,8 +4087,6 @@
                 "additionalProperties": false
             },
             "UpdateCollector": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/UpdateCollector",
                 "type": "object",
                 "properties": {
                     "name": {
@@ -4309,8 +4097,6 @@
                 "additionalProperties": false
             },
             "Collector": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/Collector",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -4329,8 +4115,6 @@
                 "additionalProperties": false
             },
             "PaginatedCollectorsResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/PaginatedCollectorsResponse",
                 "type": "object",
                 "properties": {
                     "collectors": {
@@ -4358,8 +4142,6 @@
                 "additionalProperties": false
             },
             "CreateCollection": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CreateCollection",
                 "type": "object",
                 "properties": {
                     "collectorId": {
@@ -4383,8 +4165,6 @@
                 "additionalProperties": false
             },
             "UpdateCollection": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/UpdateCollection",
                 "type": "object",
                 "properties": {
                     "name": {
@@ -4399,8 +4179,6 @@
                 "additionalProperties": false
             },
             "CollectionCardItem": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CollectionCardItem",
                 "type": "object",
                 "properties": {
                     "cardId": {
@@ -4457,8 +4235,6 @@
                 "additionalProperties": false
             },
             "CreateCollectionCard": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CreateCollectionCard",
                 "anyOf": [
                     {
                         "$ref": "#/components/schemas/CollectionCardItem"
@@ -4475,8 +4251,6 @@
                 ]
             },
             "UpdateCollectionCard": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/UpdateCollectionCard",
                 "type": "object",
                 "properties": {
                     "parallelId": {
@@ -4571,8 +4345,6 @@
                 "additionalProperties": false
             },
             "Collection": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/Collection",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -4601,8 +4373,6 @@
                 "additionalProperties": false
             },
             "CollectionCard": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CollectionCard",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -4671,8 +4441,6 @@
                 "additionalProperties": false
             },
             "PaginatedCollectionsResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/PaginatedCollectionsResponse",
                 "type": "object",
                 "properties": {
                     "collections": {
@@ -4700,8 +4468,6 @@
                 "additionalProperties": false
             },
             "PaginatedCollectionCardsResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/PaginatedCollectionCardsResponse",
                 "type": "object",
                 "properties": {
                     "cards": {
@@ -4729,8 +4495,6 @@
                 "additionalProperties": false
             },
             "BatchCollectionCardsResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/BatchCollectionCardsResponse",
                 "type": "object",
                 "properties": {
                     "cards": {
@@ -4754,8 +4518,6 @@
                 "additionalProperties": false
             },
             "AddCollectionCardsResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/AddCollectionCardsResponse",
                 "anyOf": [
                     {
                         "$ref": "#/components/schemas/CollectionCard"
@@ -4766,8 +4528,6 @@
                 ]
             },
             "TopCardInGroup": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/TopCardInGroup",
                 "type": "object",
                 "properties": {
                     "cardId": {
@@ -4814,8 +4574,6 @@
                 "additionalProperties": false
             },
             "MostValuableGroup": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/MostValuableGroup",
                 "type": "object",
                 "properties": {
                     "name": {
@@ -4834,8 +4592,6 @@
                 "additionalProperties": false
             },
             "BestPerformingGroup": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/BestPerformingGroup",
                 "type": "object",
                 "properties": {
                     "name": {
@@ -4854,8 +4610,6 @@
                 "additionalProperties": false
             },
             "CollectionBreakdownSummary": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CollectionBreakdownSummary",
                 "type": "object",
                 "properties": {
                     "totalGroups": {
@@ -4904,8 +4658,6 @@
                 "additionalProperties": false
             },
             "BreakdownPagination": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/BreakdownPagination",
                 "type": "object",
                 "properties": {
                     "total_count": {
@@ -4939,8 +4691,6 @@
                 "additionalProperties": false
             },
             "BreakdownGroup": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/BreakdownGroup",
                 "type": "object",
                 "properties": {
                     "groupKey": {
@@ -5009,8 +4759,6 @@
                 "additionalProperties": false
             },
             "CollectionBreakdownResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CollectionBreakdownResponse",
                 "type": "object",
                 "properties": {
                     "summary": {
@@ -5037,8 +4785,6 @@
                 "additionalProperties": false
             },
             "SetProgress": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/SetProgress",
                 "type": "object",
                 "properties": {
                     "setId": {
@@ -5102,8 +4848,6 @@
                 "additionalProperties": false
             },
             "SetProgressSummary": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/SetProgressSummary",
                 "type": "object",
                 "properties": {
                     "totalSets": {
@@ -5131,8 +4875,6 @@
                 "additionalProperties": false
             },
             "SetProgressListResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/SetProgressListResponse",
                 "type": "object",
                 "properties": {
                     "summary": {
@@ -5169,8 +4911,6 @@
                 "additionalProperties": false
             },
             "ParallelSetProgress": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/ParallelSetProgress",
                 "type": "object",
                 "properties": {
                     "setId": {
@@ -5240,8 +4980,6 @@
                 "additionalProperties": false
             },
             "CollectionOverview": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CollectionOverview",
                 "type": "object",
                 "properties": {
                     "totalCards": {
@@ -5265,8 +5003,6 @@
                 "additionalProperties": false
             },
             "CollectionFinancials": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CollectionFinancials",
                 "type": "object",
                 "properties": {
                     "totalInvested": {
@@ -5297,8 +5033,6 @@
                 "additionalProperties": false
             },
             "CollectionComposition": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CollectionComposition",
                 "type": "object",
                 "properties": {
                     "gradedCount": {
@@ -5332,8 +5066,6 @@
                 "additionalProperties": false
             },
             "TopGainerCard": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/TopGainerCard",
                 "type": "object",
                 "properties": {
                     "cardId": {
@@ -5382,8 +5114,6 @@
                 "additionalProperties": false
             },
             "TopValueCard": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/TopValueCard",
                 "type": "object",
                 "properties": {
                     "cardId": {
@@ -5422,8 +5152,6 @@
                 "additionalProperties": false
             },
             "CollectionPerformance": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CollectionPerformance",
                 "type": "object",
                 "properties": {
                     "averageCardValue": {
@@ -5446,8 +5174,6 @@
                 "additionalProperties": false
             },
             "CollectionAnalyticsResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CollectionAnalyticsResponse",
                 "type": "object",
                 "properties": {
                     "overview": {
@@ -5476,8 +5202,6 @@
                 "additionalProperties": false
             },
             "UploadCollectionCardImageResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/UploadCollectionCardImageResponse",
                 "type": "object",
                 "properties": {
                     "imageId": {
@@ -5508,8 +5232,6 @@
                 "additionalProperties": false
             },
             "CreateBinder": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CreateBinder",
                 "type": "object",
                 "properties": {
                     "name": {
@@ -5524,8 +5246,6 @@
                 "additionalProperties": false
             },
             "UpdateBinder": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/UpdateBinder",
                 "type": "object",
                 "properties": {
                     "name": {
@@ -5540,8 +5260,6 @@
                 "additionalProperties": false
             },
             "AddCardToBinder": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/AddCardToBinder",
                 "type": "object",
                 "properties": {
                     "collectionCardId": {
@@ -5557,8 +5275,6 @@
                 "additionalProperties": false
             },
             "Binder": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/Binder",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -5589,8 +5305,6 @@
                 "additionalProperties": false
             },
             "BinderCard": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/BinderCard",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -5620,8 +5334,6 @@
                 "additionalProperties": false
             },
             "PaginatedBindersResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/PaginatedBindersResponse",
                 "type": "object",
                 "properties": {
                     "binders": {
@@ -5649,8 +5361,6 @@
                 "additionalProperties": false
             },
             "PaginatedBinderCardsResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/PaginatedBinderCardsResponse",
                 "type": "object",
                 "properties": {
                     "cards": {
@@ -5678,8 +5388,6 @@
                 "additionalProperties": false
             },
             "FeedbackInput": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/FeedbackInput",
                 "type": "object",
                 "properties": {
                     "feedback_type": {
@@ -5705,8 +5413,6 @@
                 "additionalProperties": false
             },
             "FeedbackResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/FeedbackResponse",
                 "type": "object",
                 "properties": {
                     "unique_id": {
@@ -5793,8 +5499,6 @@
                 "additionalProperties": false
             },
             "FeedbackSubmitResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/FeedbackSubmitResponse",
                 "type": "object",
                 "properties": {
                     "success": {
@@ -5815,11 +5519,11 @@
                 "additionalProperties": false
             },
             "FileUpload": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/FileUpload",
                 "type": "object",
                 "properties": {
                     "image": {
+                        "type": "string",
+                        "format": "binary",
                         "description": "The image file to analyze"
                     }
                 },
@@ -5829,8 +5533,6 @@
                 "additionalProperties": false
             },
             "AIIdentification": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/AIIdentification",
                 "type": "object",
                 "properties": {
                     "year": {
@@ -5846,7 +5548,7 @@
                         "type": "string"
                     },
                     "name": {
-                        "description": "Player or subject name on the card (e.g., \"Michael Jordan\", \"Tom Brady\")",
+                        "description": "Player or subject name on the card, if identified (e.g., \"Michael Jordan\", \"Tom Brady\")",
                         "type": "string"
                     },
                     "number": {
@@ -5856,14 +5558,11 @@
                 },
                 "required": [
                     "year",
-                    "release",
-                    "name"
+                    "release"
                 ],
                 "additionalProperties": false
             },
             "CardDetails": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CardDetails",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -5893,6 +5592,34 @@
                     "number": {
                         "description": "Card number from catalog (e.g., \"#23\", \"RC-1\")",
                         "type": "string"
+                    },
+                    "parallel": {
+                        "description": "Parallel variant information if this card is identified as a parallel (e.g., refractor, numbered, color variant)",
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "description": "Unique identifier for the parallel type. Format: UUID v4. This ID represents the parallel variant, not individual cards.",
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                            },
+                            "name": {
+                                "description": "Name of the parallel variant. Examples: \"Gold Refractor\", \"Black Prizm\", \"Orange\". Describes the visual variant or rarity tier.",
+                                "type": "string"
+                            },
+                            "description": {
+                                "description": "Additional details about the parallel such as print run, special features, or visual description. May be null.",
+                                "type": "string"
+                            },
+                            "numberedTo": {
+                                "description": "Limited print run number for this parallel",
+                                "type": "number"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name"
+                        ],
+                        "additionalProperties": false
                     }
                 },
                 "required": [
@@ -5905,12 +5632,10 @@
                 "additionalProperties": false
             },
             "IdentificationData": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/IdentificationData",
                 "type": "object",
                 "properties": {
                     "confidence": {
-                        "description": "AI confidence level for this detection (High: 90-100%, Medium: 70-89%, Low: <70%)",
+                        "description": "AI confidence level for this detection (High: 90-100%, Medium: 75-89%, Low: 50-74%)",
                         "type": "string",
                         "enum": [
                             "High",
@@ -5918,19 +5643,22 @@
                             "Low"
                         ]
                     },
+                    "aiIdentification": {
+                        "description": "Raw AI identification result - always present. Contains year, release, and optionally set, name, number.",
+                        "$ref": "#/components/schemas/AIIdentification"
+                    },
                     "card": {
-                        "description": "Matched card details from catalog. Null if no match found or confidence too low.",
+                        "description": "Matched card details from catalog. Absent if no exact match found (partial identification).",
                         "$ref": "#/components/schemas/CardDetails"
                     }
                 },
                 "required": [
-                    "confidence"
+                    "confidence",
+                    "aiIdentification"
                 ],
                 "additionalProperties": false
             },
             "IdentifyCardResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/IdentifyCardResponse",
                 "type": "object",
                 "properties": {
                     "success": {
@@ -5960,8 +5688,6 @@
                 "additionalProperties": false
             },
             "AIQueryRequest": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/AIQueryRequest",
                 "type": "object",
                 "properties": {
                     "query": {
@@ -5995,8 +5721,6 @@
                 "additionalProperties": false
             },
             "AIContext": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/AIContext",
                 "type": "object",
                 "properties": {
                     "collectionId": {
@@ -6011,8 +5735,6 @@
                 "additionalProperties": {}
             },
             "ConversationMessage": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/ConversationMessage",
                 "type": "object",
                 "properties": {
                     "role": {
@@ -6037,8 +5759,6 @@
                 "additionalProperties": false
             },
             "AIQueryResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/AIQueryResponse",
                 "type": "object",
                 "properties": {
                     "answer": {
@@ -6064,8 +5784,6 @@
                 "additionalProperties": false
             },
             "AIError": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/AIError",
                 "type": "object",
                 "properties": {
                     "error": {
@@ -6083,8 +5801,6 @@
                 "additionalProperties": false
             },
             "ApiKeyUsage": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/ApiKeyUsage",
                 "type": "object",
                 "properties": {
                     "key": {
@@ -6105,8 +5821,6 @@
                 "additionalProperties": false
             },
             "SubscriptionInfo": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/SubscriptionInfo",
                 "type": "object",
                 "properties": {
                     "calls": {
@@ -6130,8 +5844,6 @@
                 "additionalProperties": false
             },
             "ImageJsonResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/ImageJsonResponse",
                 "type": "object",
                 "properties": {
                     "data": {
@@ -6154,8 +5866,6 @@
                 "additionalProperties": false
             },
             "Segment": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/Segment",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -6175,8 +5885,6 @@
                 "additionalProperties": false
             },
             "Manufacturer": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/Manufacturer",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -6200,8 +5908,6 @@
                 "additionalProperties": false
             },
             "Release": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/Release",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -6242,8 +5948,6 @@
                 "additionalProperties": false
             },
             "Set": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/Set",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -6273,8 +5977,6 @@
                 "additionalProperties": false
             },
             "Card": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/Card",
                 "type": "object",
                 "properties": {
                     "releaseId": {
@@ -6314,8 +6016,6 @@
                 "additionalProperties": false
             },
             "Parallel": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/Parallel",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -6345,8 +6045,6 @@
                 "additionalProperties": false
             },
             "Attribute": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/Attribute",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -6375,8 +6073,6 @@
                 "additionalProperties": false
             },
             "ParallelSummary": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/ParallelSummary",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -6423,8 +6119,6 @@
                 "additionalProperties": false
             },
             "AttributeSummary": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/DetailedAttributeResponse",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -6458,8 +6152,6 @@
                 "additionalProperties": false
             },
             "ReleaseSummary": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/ReleaseSummary",
                 "type": "object",
                 "properties": {
                     "manufacturerId": {
@@ -6499,8 +6191,6 @@
                 "additionalProperties": false
             },
             "SetSummaryWithCounts": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/SetSummaryWithCounts",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -6534,8 +6224,6 @@
                 "additionalProperties": false
             },
             "CardSummary": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CardSummary",
                 "type": "object",
                 "properties": {
                     "releaseId": {
@@ -6614,8 +6302,6 @@
                 "additionalProperties": false
             },
             "DetailedCard": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/DetailedCardResponse",
                 "type": "object",
                 "properties": {
                     "releaseId": {
@@ -6711,8 +6397,6 @@
                 "additionalProperties": false
             },
             "ReleaseWithSets": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/DetailedReleaseResponse",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -6761,8 +6445,6 @@
                 "additionalProperties": false
             },
             "ParallelWithSet": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/ParallelWithSet",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -6841,8 +6523,6 @@
                 "additionalProperties": false
             },
             "PaginatedSegmentsResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/PaginatedSegmentsResponse",
                 "type": "object",
                 "properties": {
                     "segments": {
@@ -6874,8 +6554,6 @@
                 "additionalProperties": false
             },
             "PaginatedManufacturersResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/PaginatedManufacturersResponse",
                 "type": "object",
                 "properties": {
                     "manufacturers": {
@@ -6907,8 +6585,6 @@
                 "additionalProperties": false
             },
             "PaginatedReleasesResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/PaginatedReleasesResponse",
                 "type": "object",
                 "properties": {
                     "releases": {
@@ -6940,8 +6616,6 @@
                 "additionalProperties": false
             },
             "DetailedReleaseResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/DetailedReleaseResponse",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -6990,8 +6664,6 @@
                 "additionalProperties": false
             },
             "PaginatedCardsResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/PaginatedCardsResponse",
                 "type": "object",
                 "properties": {
                     "cards": {
@@ -7023,8 +6695,6 @@
                 "additionalProperties": false
             },
             "PaginatedSetsResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/PaginatedSetsResponse",
                 "type": "object",
                 "properties": {
                     "sets": {
@@ -7102,8 +6772,6 @@
                 "additionalProperties": false
             },
             "DetailedSetResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/DetailedSetResponse",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -7161,8 +6829,6 @@
                 "additionalProperties": false
             },
             "DetailedCardResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/DetailedCardResponse",
                 "type": "object",
                 "properties": {
                     "releaseId": {
@@ -7258,8 +6924,6 @@
                 "additionalProperties": false
             },
             "PaginatedAttributesResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/PaginatedAttributesResponse",
                 "type": "object",
                 "properties": {
                     "attributes": {
@@ -7291,8 +6955,6 @@
                 "additionalProperties": false
             },
             "DetailedAttributeResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/DetailedAttributeResponse",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -7326,8 +6988,6 @@
                 "additionalProperties": false
             },
             "PaginatedParallelsResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/PaginatedParallelsResponse",
                 "type": "object",
                 "properties": {
                     "parallels": {
@@ -7359,10 +7019,14 @@
                 "additionalProperties": false
             },
             "CatalogSegmentBreakdownItem": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CatalogSegmentBreakdownItem",
                 "type": "object",
                 "properties": {
+                    "id": {
+                        "description": "Segment unique identifier",
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
                     "name": {
                         "description": "Segment name",
                         "type": "string"
@@ -7373,14 +7037,13 @@
                     }
                 },
                 "required": [
+                    "id",
                     "name",
                     "count"
                 ],
                 "additionalProperties": false
             },
             "CatalogSegmentStats": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CatalogSegmentStats",
                 "type": "object",
                 "properties": {
                     "total": {
@@ -7402,10 +7065,14 @@
                 "additionalProperties": false
             },
             "CatalogManufacturerBreakdownItem": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CatalogManufacturerBreakdownItem",
                 "type": "object",
                 "properties": {
+                    "id": {
+                        "description": "Manufacturer unique identifier",
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
                     "name": {
                         "description": "Manufacturer name",
                         "type": "string"
@@ -7416,14 +7083,13 @@
                     }
                 },
                 "required": [
+                    "id",
                     "name",
                     "releaseCount"
                 ],
                 "additionalProperties": false
             },
             "CatalogManufacturerStats": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CatalogManufacturerStats",
                 "type": "object",
                 "properties": {
                     "total": {
@@ -7445,8 +7111,6 @@
                 "additionalProperties": false
             },
             "CatalogReleaseYearBreakdown": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CatalogReleaseYearBreakdown",
                 "type": "object",
                 "properties": {
                     "year": {
@@ -7465,8 +7129,6 @@
                 "additionalProperties": false
             },
             "CatalogReleaseBySegment": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CatalogReleaseBySegment",
                 "type": "object",
                 "properties": {
                     "segmentName": {
@@ -7493,8 +7155,6 @@
                 "additionalProperties": false
             },
             "CatalogReleaseStats": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CatalogReleaseStats",
                 "type": "object",
                 "properties": {
                     "total": {
@@ -7516,8 +7176,6 @@
                 "additionalProperties": false
             },
             "CatalogSetStats": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CatalogSetStats",
                 "type": "object",
                 "properties": {
                     "total": {
@@ -7536,33 +7194,34 @@
                 "additionalProperties": false
             },
             "CatalogCardStats": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CatalogCardStats",
                 "type": "object",
                 "properties": {
                     "total": {
-                        "description": "Total number of all cards in catalog",
+                        "description": "Total cards including all parallel versions",
                         "type": "number"
                     },
                     "base": {
-                        "description": "Count of base cards (original cards)",
+                        "description": "Base cards (non-parallel, non-variation)",
                         "type": "number"
                     },
                     "variations": {
-                        "description": "Count of card variations",
+                        "description": "Variation cards (non-parallel)",
+                        "type": "number"
+                    },
+                    "parallels": {
+                        "description": "Total parallel card instances",
                         "type": "number"
                     }
                 },
                 "required": [
                     "total",
                     "base",
-                    "variations"
+                    "variations",
+                    "parallels"
                 ],
                 "additionalProperties": false
             },
             "CatalogParallelStats": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CatalogParallelStats",
                 "type": "object",
                 "properties": {
                     "total": {
@@ -7586,8 +7245,6 @@
                 "additionalProperties": false
             },
             "CatalogStatisticsResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CatalogStatisticsResponse",
                 "type": "object",
                 "properties": {
                     "segments": {
@@ -7626,8 +7283,6 @@
                 "additionalProperties": false
             },
             "CardWithOptionalParallel": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/CardWithOptionalParallel",
                 "type": "object",
                 "properties": {
                     "releaseId": {
@@ -7730,8 +7385,6 @@
                 "additionalProperties": false
             },
             "RandomReleasesResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/RandomReleasesResponse",
                 "type": "object",
                 "properties": {
                     "releases": {
@@ -7753,8 +7406,6 @@
                 "additionalProperties": false
             },
             "RandomSetsResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/RandomSetsResponse",
                 "type": "object",
                 "properties": {
                     "sets": {
@@ -7822,8 +7473,6 @@
                 "additionalProperties": false
             },
             "RandomCardsResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/RandomCardsResponse",
                 "type": "object",
                 "properties": {
                     "cards": {
@@ -7845,8 +7494,6 @@
                 "additionalProperties": false
             },
             "AutocompleteResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/AutocompleteResponse",
                 "type": "object",
                 "properties": {
                     "suggestions": {
@@ -7864,8 +7511,6 @@
                 "additionalProperties": false
             },
             "GradingCompany": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/GradingCompany",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -7910,8 +7555,6 @@
                 "additionalProperties": false
             },
             "GradingType": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/GradingType",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -7968,8 +7611,6 @@
                 "additionalProperties": false
             },
             "Grade": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/Grade",
                 "type": "object",
                 "properties": {
                     "id": {
@@ -8014,8 +7655,6 @@
                 "additionalProperties": false
             },
             "GradingCompaniesResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/GradingCompaniesResponse",
                 "type": "object",
                 "properties": {
                     "companies": {
@@ -8037,8 +7676,6 @@
                 "additionalProperties": false
             },
             "GradingTypesResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/GradingTypesResponse",
                 "type": "object",
                 "properties": {
                     "types": {
@@ -8065,8 +7702,6 @@
                 "additionalProperties": false
             },
             "GradesResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/GradesResponse",
                 "type": "object",
                 "properties": {
                     "grades": {
@@ -8098,8 +7733,6 @@
                 "additionalProperties": false
             },
             "BasicHealthResponse": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "$id": "#/components/schemas/BasicHealthResponse",
                 "type": "object",
                 "properties": {
                     "status": {
@@ -8164,6 +7797,81 @@
                 }
             }
         },
+        "/health/detailed": {
+            "get": {
+                "operationId": "getDetailedHealth",
+                "summary": "Detailed health check with dependency status",
+                "tags": [
+                    "Health"
+                ],
+                "description": "Returns detailed health status including database and Redis connectivity checks. Requires authentication.",
+                "responses": {
+                    "200": {
+                        "description": "DetailedHealthResponse",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "DetailedHealthResponse",
+                                    "type": "object",
+                                    "properties": {
+                                        "status": {
+                                            "description": "Overall health status: healthy (all dependencies up), degraded (some non-critical dependencies down), unhealthy (critical dependencies down)",
+                                            "type": "string",
+                                            "enum": [
+                                                "healthy",
+                                                "degraded",
+                                                "unhealthy"
+                                            ]
+                                        },
+                                        "timestamp": {
+                                            "description": "ISO 8601 timestamp when the health check was performed",
+                                            "type": "string"
+                                        },
+                                        "checks": {
+                                            "description": "Health status of individual dependencies (database, Redis, etc.)",
+                                            "type": "object",
+                                            "propertyNames": {
+                                                "type": "string"
+                                            },
+                                            "additionalProperties": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "status": {
+                                                        "description": "Health status of the component",
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "healthy",
+                                                            "unhealthy"
+                                                        ]
+                                                    },
+                                                    "message": {
+                                                        "description": "Optional message describing the health status",
+                                                        "type": "string"
+                                                    },
+                                                    "responseTime": {
+                                                        "description": "Response time in milliseconds",
+                                                        "type": "number"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "status"
+                                                ],
+                                                "additionalProperties": false
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "status",
+                                        "timestamp"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/v1/identify/card": {
             "post": {
                 "operationId": "identifyCard",
@@ -8171,7 +7879,7 @@
                 "tags": [
                     "Card Identification"
                 ],
-                "description": "Identify a baseball card from an image. Supports both multipart/form-data and direct binary upload (image/jpeg, image/png, image/webp). Maximum file size: 10MB. Supported formats: JPEG, PNG, WebP.",
+                "description": "Identify a baseball card from an image. Supports both multipart/form-data and direct binary upload (image/jpeg, image/png, image/webp). Maximum file size: 20MB. Supported formats: JPEG, PNG, WebP, HEIF, HEIC.",
                 "requestBody": {
                     "content": {
                         "multipart/form-data": {
@@ -8321,12 +8029,12 @@
                             "default": 20,
                             "type": "integer",
                             "exclusiveMinimum": 0,
-                            "maximum": 1000
+                            "maximum": 50
                         },
                         "in": "query",
                         "name": "take",
                         "required": false,
-                        "description": "Number of items to return per page. Minimum: 1, Maximum: 1000, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
+                        "description": "Number of items to return per page. Minimum: 1, Maximum: 50, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
                     },
                     {
                         "schema": {
@@ -8459,12 +8167,12 @@
                             "default": 20,
                             "type": "integer",
                             "exclusiveMinimum": 0,
-                            "maximum": 1000
+                            "maximum": 50
                         },
                         "in": "query",
                         "name": "take",
                         "required": false,
-                        "description": "Number of items to return per page. Minimum: 1, Maximum: 1000, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
+                        "description": "Number of items to return per page. Minimum: 1, Maximum: 50, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
                     },
                     {
                         "schema": {
@@ -8597,12 +8305,12 @@
                             "default": 20,
                             "type": "integer",
                             "exclusiveMinimum": 0,
-                            "maximum": 1000
+                            "maximum": 50
                         },
                         "in": "query",
                         "name": "take",
                         "required": false,
-                        "description": "Number of items to return per page. Minimum: 1, Maximum: 1000, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
+                        "description": "Number of items to return per page. Minimum: 1, Maximum: 50, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
                     },
                     {
                         "schema": {
@@ -8870,12 +8578,12 @@
                             "default": 20,
                             "type": "integer",
                             "exclusiveMinimum": 0,
-                            "maximum": 1000
+                            "maximum": 50
                         },
                         "in": "query",
                         "name": "take",
                         "required": false,
-                        "description": "Number of items to return per page. Minimum: 1, Maximum: 1000, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
+                        "description": "Number of items to return per page. Minimum: 1, Maximum: 50, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
                     },
                     {
                         "schema": {
@@ -9201,12 +8909,12 @@
                             "default": 20,
                             "type": "integer",
                             "exclusiveMinimum": 0,
-                            "maximum": 1000
+                            "maximum": 50
                         },
                         "in": "query",
                         "name": "take",
                         "required": false,
-                        "description": "Number of items to return per page. Minimum: 1, Maximum: 1000, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
+                        "description": "Number of items to return per page. Minimum: 1, Maximum: 50, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
                     },
                     {
                         "schema": {
@@ -9475,12 +9183,12 @@
                             "default": 20,
                             "type": "integer",
                             "exclusiveMinimum": 0,
-                            "maximum": 1000
+                            "maximum": 50
                         },
                         "in": "query",
                         "name": "take",
                         "required": false,
-                        "description": "Number of items to return per page. Minimum: 1, Maximum: 1000, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
+                        "description": "Number of items to return per page. Minimum: 1, Maximum: 50, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
                     },
                     {
                         "schema": {
@@ -9806,12 +9514,12 @@
                             "default": 20,
                             "type": "integer",
                             "exclusiveMinimum": 0,
-                            "maximum": 1000
+                            "maximum": 50
                         },
                         "in": "query",
                         "name": "take",
                         "required": false,
-                        "description": "Number of items to return per page. Minimum: 1, Maximum: 1000, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
+                        "description": "Number of items to return per page. Minimum: 1, Maximum: 50, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
                     },
                     {
                         "schema": {
@@ -10381,12 +10089,12 @@
                             "default": 20,
                             "type": "integer",
                             "exclusiveMinimum": 0,
-                            "maximum": 1000
+                            "maximum": 50
                         },
                         "in": "query",
                         "name": "take",
                         "required": false,
-                        "description": "Number of items to return per page. Minimum: 1, Maximum: 1000, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
+                        "description": "Number of items to return per page. Minimum: 1, Maximum: 50, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
                     },
                     {
                         "schema": {
@@ -10619,12 +10327,12 @@
                             "default": 20,
                             "type": "integer",
                             "exclusiveMinimum": 0,
-                            "maximum": 1000
+                            "maximum": 50
                         },
                         "in": "query",
                         "name": "take",
                         "required": false,
-                        "description": "Number of items to return per page. Minimum: 1, Maximum: 1000, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
+                        "description": "Number of items to return per page. Minimum: 1, Maximum: 50, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
                     },
                     {
                         "schema": {
@@ -11571,12 +11279,12 @@
                             "default": 20,
                             "type": "integer",
                             "exclusiveMinimum": 0,
-                            "maximum": 1000
+                            "maximum": 50
                         },
                         "in": "query",
                         "name": "take",
                         "required": false,
-                        "description": "Number of items to return per page. Minimum: 1, Maximum: 1000, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
+                        "description": "Number of items to return per page. Minimum: 1, Maximum: 50, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
                     },
                     {
                         "schema": {
@@ -12016,12 +11724,12 @@
                             "default": 20,
                             "type": "integer",
                             "exclusiveMinimum": 0,
-                            "maximum": 1000
+                            "maximum": 50
                         },
                         "in": "query",
                         "name": "take",
                         "required": false,
-                        "description": "Number of items to return per page. Minimum: 1, Maximum: 1000, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
+                        "description": "Number of items to return per page. Minimum: 1, Maximum: 50, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
                     },
                     {
                         "schema": {
@@ -12423,12 +12131,12 @@
                             "default": 20,
                             "type": "integer",
                             "exclusiveMinimum": 0,
-                            "maximum": 1000
+                            "maximum": 50
                         },
                         "in": "query",
                         "name": "take",
                         "required": false,
-                        "description": "Number of items to return per page. Minimum: 1, Maximum: 1000, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
+                        "description": "Number of items to return per page. Minimum: 1, Maximum: 50, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
                     },
                     {
                         "schema": {
@@ -12692,12 +12400,12 @@
                             "default": 20,
                             "type": "integer",
                             "exclusiveMinimum": 0,
-                            "maximum": 1000
+                            "maximum": 50
                         },
                         "in": "query",
                         "name": "take",
                         "required": false,
-                        "description": "Number of items to return per page. Minimum: 1, Maximum: 1000, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
+                        "description": "Number of items to return per page. Minimum: 1, Maximum: 50, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
                     },
                     {
                         "schema": {
@@ -13151,12 +12859,12 @@
                             "default": 20,
                             "type": "integer",
                             "exclusiveMinimum": 0,
-                            "maximum": 1000
+                            "maximum": 50
                         },
                         "in": "query",
                         "name": "take",
                         "required": false,
-                        "description": "Number of items to return per page. Minimum: 1, Maximum: 1000, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
+                        "description": "Number of items to return per page. Minimum: 1, Maximum: 50, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
                     },
                     {
                         "schema": {
@@ -13724,12 +13432,12 @@
                             "default": 20,
                             "type": "integer",
                             "exclusiveMinimum": 0,
-                            "maximum": 1000
+                            "maximum": 50
                         },
                         "in": "query",
                         "name": "take",
                         "required": false,
-                        "description": "Number of items to return per page. Minimum: 1, Maximum: 1000, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
+                        "description": "Number of items to return per page. Minimum: 1, Maximum: 50, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
                     },
                     {
                         "schema": {
@@ -14272,12 +13980,12 @@
                             "default": 20,
                             "type": "integer",
                             "exclusiveMinimum": 0,
-                            "maximum": 1000
+                            "maximum": 50
                         },
                         "in": "query",
                         "name": "take",
                         "required": false,
-                        "description": "Number of items to return per page. Minimum: 1, Maximum: 1000, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
+                        "description": "Number of items to return per page. Minimum: 1, Maximum: 50, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
                     },
                     {
                         "schema": {
@@ -14698,12 +14406,12 @@
                             "default": 20,
                             "type": "integer",
                             "exclusiveMinimum": 0,
-                            "maximum": 1000
+                            "maximum": 50
                         },
                         "in": "query",
                         "name": "take",
                         "required": false,
-                        "description": "Number of items to return per page. Minimum: 1, Maximum: 1000, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
+                        "description": "Number of items to return per page. Minimum: 1, Maximum: 50, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
                     },
                     {
                         "schema": {
@@ -15197,12 +14905,12 @@
                             "default": 20,
                             "type": "integer",
                             "exclusiveMinimum": 0,
-                            "maximum": 1000
+                            "maximum": 50
                         },
                         "in": "query",
                         "name": "take",
                         "required": false,
-                        "description": "Number of items to return per page. Minimum: 1, Maximum: 1000, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
+                        "description": "Number of items to return per page. Minimum: 1, Maximum: 50, Default: 20. Use larger values for bulk data retrieval, smaller for responsive UIs."
                     },
                     {
                         "schema": {
@@ -16541,6 +16249,48 @@
     "security": [
         {
             "apiKey": []
+        }
+    ],
+    "tags": [
+        {
+            "name": "Card Identification",
+            "description": "AI-powered card identification from images"
+        },
+        {
+            "name": "Catalog",
+            "description": "Browse and search the card catalog"
+        },
+        {
+            "name": "Collection Management",
+            "description": "Manage card collections and inventory (Free)"
+        },
+        {
+            "name": "Collectors",
+            "description": "Collector profile management (Free)"
+        },
+        {
+            "name": "Lists",
+            "description": "Create and manage card want/trade lists (Free)"
+        },
+        {
+            "name": "Grades",
+            "description": "Grading company and population data (Free)"
+        },
+        {
+            "name": "Autocomplete",
+            "description": "Search suggestions for catalog fields (Free)"
+        },
+        {
+            "name": "Feedback",
+            "description": "Submit feedback and corrections (Free)"
+        },
+        {
+            "name": "Subscription",
+            "description": "API subscription and usage information (Free)"
+        },
+        {
+            "name": "Health",
+            "description": "Service health and status checks (Free)"
         }
     ]
 }
