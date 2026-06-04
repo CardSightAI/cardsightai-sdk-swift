@@ -60,6 +60,12 @@ public class CardSightAI {
     /// For direct API access, use the ``raw`` client.
     public lazy var identify = IdentifyAPI(client: self)
 
+    /// Lightweight card-detection helper
+    ///
+    /// Provides a fast, low-cost presence check (`detect.card`) with the same automatic
+    /// image processing as ``identify``. For direct API access, use the ``raw`` client.
+    public lazy var detect = DetectAPI(client: self)
+
     /// Initialize the CardSightAI client with a configuration object.
     ///
     /// - Parameter config: Configuration for the client
@@ -184,8 +190,9 @@ public class CardSightAI {
     /// let companies = try await client.getGradingCompanies()
     /// ```
     ///
-    /// All 79 API operations are available as methods on this client with clean names like:
-    /// - `getCards`, `getCard`, `getSets`, `getReleases`
+    /// All 94 API operations are available as methods on this client with clean names like:
+    /// - `getCards`, `getCard`, `getSets`, `getReleases`, `searchCatalog`
+    /// - `getCardPricing`, `getCardMarketplace`, `getCardPopulation`, `getReleaseCalendar`
     /// - `getCollections`, `createCollection`, `updateCollection`
     /// - `getGradingCompanies`, `getGradingTypes`, `getGrades`
     /// - And many more...
@@ -230,6 +237,22 @@ private struct TimeoutMiddleware: ClientMiddleware {
     }
 }
 
+// MARK: - Image Upload Helpers
+
+/// Builds the multipart/form-data body shared by every image-upload endpoint.
+///
+/// The API requires a multipart form with an `image` field that carries both a
+/// `Content-Disposition` and a `Content-Type` header, so we construct the part
+/// from raw headers rather than a typed `MultipartPart`.
+private func imageMultipartBody(_ imageData: Data) -> MultipartBody<Components.Schemas.FileUploadInput> {
+    var headerFields = HTTPFields()
+    headerFields[.contentDisposition] = #"form-data; name="image"; filename="image.jpg""#
+    headerFields[.contentType] = "image/jpeg"
+
+    let rawPart = MultipartRawPart(headerFields: headerFields, body: HTTPBody(imageData))
+    return [.undocumented(rawPart)]
+}
+
 // MARK: - Identify API Helper
 
 /// Card identification API endpoints for AI-powered card recognition.
@@ -253,9 +276,14 @@ private struct TimeoutMiddleware: ClientMiddleware {
 /// let image: UIImage = // ... selected from camera or library
 /// let result = try await client.identify.card(image)
 ///
+/// // Identification can be scoped to a known segment (e.g. "baseball")
+/// let result = try await client.identify.cardBySegment(image, segment: "baseball")
+///
 /// // Access identification results
 /// if case .ok(let response) = result {
-///     print("Identified: \(response.card.name)")
+///     for detection in response.body.json.detections ?? [] {
+///         print("Identified: \(detection.card.name ?? "Unknown") [\(detection.confidence)]")
+///     }
 /// }
 /// ```
 public class IdentifyAPI {
@@ -282,10 +310,6 @@ public class IdentifyAPI {
     /// # Example
     /// ```swift
     /// // Capture from camera with optimization (recommended for cellular networks)
-    /// let picker = UIImagePickerController()
-    /// picker.sourceType = .camera
-    /// // ... get selected image
-    ///
     /// let result = try await client.identify.card(selectedImage)
     ///
     /// // Or disable optimization to send full resolution
@@ -296,137 +320,188 @@ public class IdentifyAPI {
     ///   When optimized is false but autoProcessImages is enabled, images are resized to maximum 2048x2048 pixels.
     ///   Configure ``ImageProcessingOptions`` in ``CardSightAIConfig`` to customize non-optimized processing.
     public func card(_ image: UIImage, optimized: Bool = true) async throws -> Operations.identifyCard.Output {
-        guard let client = client else {
-            throw CardSightAIError.unknown("Client has been deallocated")
-        }
+        try await identify(prepare(image, optimized: optimized))
+    }
 
-        // Use optimization or standard processing
-        let imageData: Data
-        if optimized {
-            imageData = try await client.imageProcessor.optimizeForUpload(image)
-        } else if client.config.autoProcessImages {
-            imageData = try await client.imageProcessor.processForUpload(image)
-        } else {
-            guard let data = image.jpegData(compressionQuality: 0.8) else {
-                throw CardSightAIError.imageProcessingError("Failed to convert image to JPEG")
-            }
-            imageData = data
-        }
+    /// Identify a trading card from a UIImage, scoped to a known segment (e.g. `"baseball"`).
+    ///
+    /// Scoping to a segment can improve accuracy and speed when the sport/TCG type is already known.
+    ///
+    /// - Parameters:
+    ///   - image: The image containing the trading card
+    ///   - segment: The segment slug or UUID to scope identification to (e.g. `"baseball"`, `"football"`)
+    ///   - optimized: Whether to optimize the image for upload. Default: true
+    /// - Returns: Card identification result with matched card information
+    public func cardBySegment(_ image: UIImage, segment: String, optimized: Bool = true) async throws -> Operations.identifyCardBySegment.Output {
+        try await identify(prepare(image, optimized: optimized), segment: segment)
+    }
 
-        return try await cardFromData(imageData)
+    private func prepare(_ image: UIImage, optimized: Bool) async throws -> Data {
+        let client = try requireClient()
+        return try await client.imageProcessor.prepareForUpload(image, optimized: optimized, autoProcess: client.config.autoProcessImages)
     }
     #endif
 
     #if canImport(AppKit)
-    /// Identify a card from an NSImage
+    /// Identify a card from an NSImage.
     ///
     /// - Parameters:
     ///   - image: The image containing the trading card
     ///   - optimized: Whether to optimize the image for upload (smallest dimension: 900px, 80% JPEG quality). Default: true
     /// - Returns: Card identification result with matched card information
-    /// - Throws: ``CardSightAIError/imageProcessingError(_:)`` if image processing fails
-    /// - Throws: ``CardSightAIError/networkError(_:)`` if upload fails
-    /// - Throws: ``CardSightAIError/apiError(statusCode:message:response:)`` if identification fails
     public func card(_ image: NSImage, optimized: Bool = true) async throws -> Operations.identifyCard.Output {
-        guard let client = client else {
-            throw CardSightAIError.unknown("Client has been deallocated")
-        }
+        try await identify(prepare(image, optimized: optimized))
+    }
 
-        // Use optimization or standard processing
-        let imageData: Data
-        if optimized {
-            imageData = try await client.imageProcessor.optimizeForUpload(image)
-        } else if client.config.autoProcessImages {
-            imageData = try await client.imageProcessor.processForUpload(image)
-        } else {
-            guard let tiffData = image.tiffRepresentation,
-                  let bitmapImage = NSBitmapImageRep(data: tiffData),
-                  let data = bitmapImage.representation(using: .jpeg, properties: [.compressionFactor: 0.8]) else {
-                throw CardSightAIError.imageProcessingError("Failed to convert image to JPEG")
-            }
-            imageData = data
-        }
+    /// Identify a card from an NSImage, scoped to a known segment (e.g. `"baseball"`).
+    ///
+    /// - Parameters:
+    ///   - image: The image containing the trading card
+    ///   - segment: The segment slug or UUID to scope identification to
+    ///   - optimized: Whether to optimize the image for upload. Default: true
+    /// - Returns: Card identification result with matched card information
+    public func cardBySegment(_ image: NSImage, segment: String, optimized: Bool = true) async throws -> Operations.identifyCardBySegment.Output {
+        try await identify(prepare(image, optimized: optimized), segment: segment)
+    }
 
-        return try await cardFromData(imageData)
+    private func prepare(_ image: NSImage, optimized: Bool) async throws -> Data {
+        let client = try requireClient()
+        return try await client.imageProcessor.prepareForUpload(image, optimized: optimized, autoProcess: client.config.autoProcessImages)
     }
     #endif
 
-    /// Identify a card from image data
+    /// Identify a card from raw image data.
     ///
     /// - Parameters:
-    ///   - imageData: The image data to process
-    ///   - optimized: Whether to optimize the image for upload (smallest dimension: 900px, 80% JPEG quality). Default: true
+    ///   - imageData: The image data to process (JPEG, PNG, or HEIC/HEIF)
+    ///   - optimized: Whether to optimize the image for upload. Default: true
     /// - Returns: Card identification result with matched card information
-    /// - Throws: ``CardSightAIError/imageProcessingError(_:)`` if image processing fails
-    /// - Throws: ``CardSightAIError/networkError(_:)`` if upload fails
-    /// - Throws: ``CardSightAIError/apiError(statusCode:message:response:)`` if identification fails
     public func card(_ imageData: Data, optimized: Bool = true) async throws -> Operations.identifyCard.Output {
-        guard let client = client else {
-            throw CardSightAIError.unknown("Client has been deallocated")
-        }
-
-        // Use optimization or standard processing
-        let processedData: Data
-        if optimized {
-            processedData = try await client.imageProcessor.optimizeForUpload(imageData)
-        } else if client.config.autoProcessImages {
-            processedData = try await client.imageProcessor.processForUpload(imageData)
-        } else {
-            processedData = imageData
-        }
-
-        return try await cardFromData(processedData)
+        try await identify(prepare(imageData, optimized: optimized))
     }
 
-    /// Identify a card from a file URL
+    /// Identify a card from raw image data, scoped to a known segment.
+    public func cardBySegment(_ imageData: Data, segment: String, optimized: Bool = true) async throws -> Operations.identifyCardBySegment.Output {
+        try await identify(prepare(imageData, optimized: optimized), segment: segment)
+    }
+
+    /// Identify a card from a file URL.
     ///
     /// - Parameters:
     ///   - url: The URL of the image file
-    ///   - optimized: Whether to optimize the image for upload (smallest dimension: 900px, 80% JPEG quality). Default: true
+    ///   - optimized: Whether to optimize the image for upload. Default: true
     /// - Returns: Card identification result with matched card information
-    /// - Throws: ``CardSightAIError/imageProcessingError(_:)`` if image processing fails
-    /// - Throws: ``CardSightAIError/networkError(_:)`` if upload fails
-    /// - Throws: ``CardSightAIError/apiError(statusCode:message:response:)`` if identification fails
     public func card(_ url: URL, optimized: Bool = true) async throws -> Operations.identifyCard.Output {
-        guard let client = client else {
-            throw CardSightAIError.unknown("Client has been deallocated")
-        }
-
-        // Use optimization or standard processing
-        let imageData: Data
-        if optimized {
-            imageData = try await client.imageProcessor.optimizeForUpload(url)
-        } else if client.config.autoProcessImages {
-            imageData = try await client.imageProcessor.processForUpload(url)
-        } else {
-            imageData = try Data(contentsOf: url)
-        }
-
-        return try await cardFromData(imageData)
+        try await identify(prepare(url, optimized: optimized))
     }
 
-    private func cardFromData(_ imageData: Data) async throws -> Operations.identifyCard.Output {
+    /// Identify a card from a file URL, scoped to a known segment.
+    public func cardBySegment(_ url: URL, segment: String, optimized: Bool = true) async throws -> Operations.identifyCardBySegment.Output {
+        try await identify(prepare(url, optimized: optimized), segment: segment)
+    }
+
+    private func prepare(_ imageData: Data, optimized: Bool) async throws -> Data {
+        let client = try requireClient()
+        return try await client.imageProcessor.prepareForUpload(imageData, optimized: optimized, autoProcess: client.config.autoProcessImages)
+    }
+
+    private func prepare(_ url: URL, optimized: Bool) async throws -> Data {
+        let client = try requireClient()
+        return try await client.imageProcessor.prepareForUpload(url, optimized: optimized, autoProcess: client.config.autoProcessImages)
+    }
+
+    private func identify(_ imageData: Data) async throws -> Operations.identifyCard.Output {
+        let client = try requireClient()
+        let input = Operations.identifyCard.Input(body: .multipartForm(imageMultipartBody(imageData)))
+        return try await client.raw.identifyCard(input)
+    }
+
+    private func identify(_ imageData: Data, segment: String) async throws -> Operations.identifyCardBySegment.Output {
+        let client = try requireClient()
+        let input = Operations.identifyCardBySegment.Input(
+            path: .init(segment: segment),
+            body: .multipartForm(imageMultipartBody(imageData))
+        )
+        return try await client.raw.identifyCardBySegment(input)
+    }
+
+    private func requireClient() throws -> CardSightAI {
         guard let client = client else {
             throw CardSightAIError.unknown("Client has been deallocated")
         }
+        return client
+    }
+}
 
-        // Create multipart/form-data body with proper headers
-        // The API requires multipart form-data with an "image" field and Content-Type header
-        let httpBody = HTTPBody(imageData)
+// MARK: - Detect API Helper
 
-        // Build headers for the multipart part
-        var headerFields = HTTPFields()
-        headerFields[.contentDisposition] = #"form-data; name="image"; filename="image.jpg""#
-        headerFields[.contentType] = "image/jpeg"
+/// Lightweight card-presence detection.
+///
+/// `detect.card` is a faster, cheaper alternative to full identification when you
+/// only need to know whether a trading card is present in an image (and how many),
+/// without resolving it against the catalog. It shares the same automatic image
+/// processing as ``IdentifyAPI``.
+///
+/// # Example
+/// ```swift
+/// let result = try await client.detect.card(image)
+/// if case .ok(let response) = result {
+///     print("Detected \(response.body.json.count) card(s)")
+/// }
+/// ```
+public class DetectAPI {
+    private weak var client: CardSightAI?
 
-        // Create raw multipart part with headers
-        let rawPart = MultipartRawPart(headerFields: headerFields, body: httpBody)
-        let multipartBody: MultipartBody<Components.Schemas.FileUploadInput> = [.undocumented(rawPart)]
+    init(client: CardSightAI) {
+        self.client = client
+    }
 
-        let input = Operations.identifyCard.Input(
-            body: .multipartForm(multipartBody)
-        )
+    #if canImport(UIKit)
+    /// Detect whether a trading card is present in a UIImage.
+    /// - Parameters:
+    ///   - image: The image to inspect
+    ///   - optimized: Whether to optimize the image for upload. Default: true
+    /// - Returns: Detection result with `detected` flag and card `count`
+    public func card(_ image: UIImage, optimized: Bool = true) async throws -> Operations.detectCard.Output {
+        let client = try requireClient()
+        let data = try await client.imageProcessor.prepareForUpload(image, optimized: optimized, autoProcess: client.config.autoProcessImages)
+        return try await detect(data)
+    }
+    #endif
 
-        return try await client.raw.identifyCard(input)
+    #if canImport(AppKit)
+    /// Detect whether a trading card is present in an NSImage.
+    public func card(_ image: NSImage, optimized: Bool = true) async throws -> Operations.detectCard.Output {
+        let client = try requireClient()
+        let data = try await client.imageProcessor.prepareForUpload(image, optimized: optimized, autoProcess: client.config.autoProcessImages)
+        return try await detect(data)
+    }
+    #endif
+
+    /// Detect whether a trading card is present in raw image data.
+    public func card(_ imageData: Data, optimized: Bool = true) async throws -> Operations.detectCard.Output {
+        let client = try requireClient()
+        let data = try await client.imageProcessor.prepareForUpload(imageData, optimized: optimized, autoProcess: client.config.autoProcessImages)
+        return try await detect(data)
+    }
+
+    /// Detect whether a trading card is present in an image at a file URL.
+    public func card(_ url: URL, optimized: Bool = true) async throws -> Operations.detectCard.Output {
+        let client = try requireClient()
+        let data = try await client.imageProcessor.prepareForUpload(url, optimized: optimized, autoProcess: client.config.autoProcessImages)
+        return try await detect(data)
+    }
+
+    private func detect(_ imageData: Data) async throws -> Operations.detectCard.Output {
+        let client = try requireClient()
+        let input = Operations.detectCard.Input(body: .multipartForm(imageMultipartBody(imageData)))
+        return try await client.raw.detectCard(input)
+    }
+
+    private func requireClient() throws -> CardSightAI {
+        guard let client = client else {
+            throw CardSightAIError.unknown("Client has been deallocated")
+        }
+        return client
     }
 }

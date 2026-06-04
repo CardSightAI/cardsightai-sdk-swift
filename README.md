@@ -29,7 +29,11 @@ The most comprehensive baseball card identification and collection management pl
 | Feature | Description |
 |---------|-------------|
 | **Card Identification** | Identify cards from images using AI with automatic HEIC to JPEG conversion |
-| **Catalog Search** | Search 2M+ baseball cards database |
+| **Card Detection** | Fast, low-cost presence check (`detect.card`) without full identification |
+| **Catalog Search** | Global fuzzy search across 2M+ cards, sets, releases, and parallels |
+| **Pricing & Marketplace** | Completed-sales pricing history and active marketplace listings |
+| **Population Reports** | Graded population counts by card, set, or release |
+| **Release Calendar** | Upcoming releases with pre-order dates |
 | **Collections** | Manage owned card collections with analytics |
 | **Collectors** | Manage collector profiles |
 | **Lists** | Track wanted cards (wishlists) |
@@ -51,7 +55,7 @@ Add the following to your `Package.swift` file:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/cardsightai/cardsightai-sdk-swift.git", from: "2.1.3")
+    .package(url: "https://github.com/cardsightai/cardsightai-sdk-swift.git", from: "2.2.0")
 ]
 ```
 
@@ -190,9 +194,40 @@ case .ok(let response):
             // Each detection represents a physical card in the image
             for detection in detections {
                 if let card = detection.card {
-                    print("[\(detection.confidence)] \(card.name) - \(card.year)")
+                    print("[\(detection.confidence)] \(card.name ?? "Unknown") - \(card.year ?? "")")
                 }
             }
+        }
+    }
+default:
+    break
+}
+```
+
+### Segment-Specific Identification
+
+When you already know the sport / TCG type, scope identification to a segment for better accuracy and speed. The same automatic image processing applies, and the same input types are supported (`UIImage`, `NSImage`, `Data`, `URL`):
+
+```swift
+// Scope identification to a known segment (e.g. "baseball", "football")
+let result = try await client.identify.cardBySegment(image, segment: "baseball")
+```
+
+### Card Detection (Lightweight)
+
+When you only need to know whether a trading card is present — for example to gate a capture UI — `detect.card` is a faster, cheaper alternative to full identification:
+
+```swift
+let result = try await client.detect.card(image)
+
+switch result {
+case .ok(let response):
+    switch response.body {
+    case .json(let detection):
+        if detection.detected {
+            print("Detected \(detection.count) card(s)")
+        } else {
+            print("No card in frame")
         }
     }
 default:
@@ -284,6 +319,105 @@ let parallels = try await client.raw.getParallels()
 
 // Get catalog statistics
 let stats = try await client.raw.getCatalogStatistics()
+```
+
+### Global Catalog Search
+
+Fuzzy search across cards, sets, releases, and parallels in one call:
+
+```swift
+var query = Operations.searchCatalog.Input.Query(q: "1989 Upper Deck Griffey")
+query.type = .card        // optional: card | set | release | parallel
+query.take = 20
+
+let result = try await client.raw.searchCatalog(.init(query: query))
+if case .ok(let response) = result {
+    let search = response.body.json
+    print("Found \(Int(search.total_count)) results")
+    for item in search.results {
+        print(item)
+    }
+}
+```
+
+### Pricing & Marketplace
+
+```swift
+// Completed-sales pricing history for a card
+var pricingQuery = Operations.getCardPricing.Input.Query()
+pricingQuery.period = "3m"            // "7d", "2w", "3m", "1y", "all"
+pricingQuery.listing_type = .both     // .auction, .fixed, .both
+pricingQuery.limit = 50
+
+let pricing = try await client.raw.getCardPricing(
+    .init(path: .init(card_id: "card_uuid"), query: pricingQuery)
+)
+if case .ok(let response) = pricing {
+    let body = response.body.json
+    for sale in body.raw.records {
+        print("\(sale.date ?? "?"): $\(sale.price) on \(sale.source)")
+    }
+}
+
+// Bulk pricing for many cards at once
+let bulk = try await client.raw.getBulkPricing(
+    .init(body: .json(.init(card_ids: ["card_uuid_1", "card_uuid_2"], period: "1y")))
+)
+
+// Active marketplace listings
+let marketplace = try await client.raw.getCardMarketplace(
+    .init(path: .init(card_id: "card_uuid"))
+)
+if case .ok(let response) = marketplace {
+    for listing in response.body.json.raw.records {
+        print("\(listing.title) — \(listing.price.map { "$\($0)" } ?? "no price") (\(listing.source))")
+    }
+}
+```
+
+### Population Reports
+
+```swift
+// Graded population for a card (optionally filtered by grading company)
+var popQuery = Operations.getCardPopulation.Input.Query()
+popQuery.grading_company_id = "psa_company_uuid"
+
+let population = try await client.raw.getCardPopulation(
+    .init(path: .init(card_id: "card_uuid"), query: popQuery)
+)
+if case .ok(let response) = population {
+    print("Total graded: \(response.body.json.total_population)")
+}
+
+// Set-level and release-level reports are also available:
+// client.raw.getSetPopulation(...) and client.raw.getReleasePopulation(...)
+```
+
+### Release Calendar
+
+```swift
+var calendarQuery = Operations.getReleaseCalendar.Input.Query()
+calendarQuery.year = "2026"
+calendarQuery.segment = "baseball"     // UUID or case-insensitive name
+
+let calendar = try await client.raw.getReleaseCalendar(.init(query: calendarQuery))
+if case .ok(let response) = calendar {
+    for entry in response.body.json.release_calendar {
+        print("\(entry.name) — releases \(entry.release_date ?? "TBD"), pre-order \(entry.pre_order_date ?? "—")")
+    }
+}
+```
+
+### Set Identifiability (Quota-Free)
+
+Pre-flight checks that do **not** consume identification quota:
+
+```swift
+// List the sets the identifier currently recognizes
+let sets = try await client.raw.listIdentifiableSets(.init(query: .init()))
+
+// Check whether a specific set can be identified
+let check = try await client.raw.checkSetIdentifiable(.init(path: .init(set_id: "set_uuid")))
 ```
 
 ### Collection Management
@@ -386,6 +520,11 @@ let photo = // ... from camera
 let result = try await client.identify.card(photo) // Handles HEIC → JPEG
 ```
 
+HEIC photos carry their rotation in EXIF/container orientation metadata. The SDK
+bakes that orientation into the pixels during conversion (via ImageIO's
+`kCGImageSourceCreateThumbnailWithTransform`), so landscape and portrait shots
+are uploaded upright rather than sideways or upside-down.
+
 ### Manual Image Processing
 
 ```swift
@@ -435,29 +574,35 @@ let client = try CardSightAI(config: config)
 
 ✅ **100% Coverage Verified**
 
-The SDK provides complete coverage of all **79 CardSight AI REST API endpoints** (including 3 new random catalog endpoints):
+The SDK provides complete coverage of all **94 CardSight AI REST API endpoints**:
 
 | Category | Endpoints | Coverage | SDK Access |
 |----------|-----------|----------|------------|
 | **Health** | 2 | 100% | `client.getHealth()`, `client.getHealthAuthenticated()` |
-| **Card Identification** | 1 | 100% | `client.identify.card()` |
-| **Catalog** | 17 | 100% | `client.raw.getCards()`, `client.raw.getSets()`, etc. |
+| **Card Identification** | 4 | 100% | `client.identify.card()`, `client.identify.cardBySegment()`, `client.raw.listIdentifiableSets()`, `client.raw.checkSetIdentifiable()` |
+| **Card Detection** | 1 | 100% | `client.detect.card()` |
+| **Catalog** | 21 | 100% | `client.raw.getCards()`, `client.raw.searchCatalog()`, `client.raw.getFields()`, etc. |
+| **Pricing** | 2 | 100% | `client.raw.getCardPricing()`, `client.raw.getBulkPricing()` |
+| **Marketplace** | 1 | 100% | `client.raw.getCardMarketplace()` |
+| **Population** | 3 | 100% | `client.raw.getCardPopulation()`, `client.raw.getSetPopulation()`, `client.raw.getReleasePopulation()` |
+| **Release Calendar** | 1 | 100% | `client.raw.getReleaseCalendar()` |
 | **Collections** | 23 | 100% | `client.raw.getCollections()`, `client.raw.createCollection()`, etc. |
 | **Collectors** | 5 | 100% | `client.raw.getCollectors()`, etc. |
 | **Lists** | 8 | 100% | `client.raw.getLists()`, etc. |
 | **Grades** | 3 | 100% | `client.raw.getGradingCompanies()`, etc. |
 | **Autocomplete** | 6 | 100% | `client.raw.autocompleteCards()`, etc. |
 | **AI** | 1 | 100% | `client.raw.queryAI()` |
-| **Images** | 1 | 100% | `client.raw.getCardImage()` |
+| **Images** | 4 | 100% | `client.raw.getCardImage()`, etc. |
 | **Feedback** | 8 | 100% | `client.raw.submitGeneralFeedback()`, etc. |
 | **Subscription** | 1 | 100% | `client.raw.getSubscription()` |
-| **TOTAL** | **79** | **100%** | - |
+| **TOTAL** | **94** | **100%** | - |
 
 ### Special Features
 
-The SDK includes a convenience wrapper for card identification that handles image processing automatically:
+The SDK includes convenience wrappers for the image-upload endpoints that handle image processing automatically:
 
-- 🎯 **`client.identify.card()`** - Automatic HEIC conversion, resizing, optimization, and multipart upload
+- 🎯 **`client.identify.card()`** / **`client.identify.cardBySegment()`** - Automatic HEIC conversion (with EXIF orientation correction), resizing, optimization, and multipart upload
+- 🔍 **`client.detect.card()`** - Same automatic image processing for the lightweight presence check
 - All other endpoints use the auto-generated client directly via `client.raw.{operationName}()`
 
 ## Building from Source
@@ -479,24 +624,15 @@ make test
 
 ## OpenAPI Spec Patching
 
-When updating the OpenAPI specification (`make update-spec`), a post-processing script automatically patches certain schemas for forward-compatibility.
-
-### Why This Is Needed
-
-Apple's [swift-openapi-generator](https://github.com/apple/swift-openapi-generator) strictly enforces `additionalProperties: false` constraints from the OpenAPI spec. When the CardSight API returns new fields not yet documented in the spec, this causes decoding failures.
-
-The maintainers of swift-openapi-generator [officially recommend](https://github.com/apple/swift-openapi-generator/issues/608) preprocessing the OpenAPI document to handle forward-compatibility.
+When updating the OpenAPI specification (`make update-spec`), a post-processing script (`Scripts/patch-openapi-spec.py`) automatically rewrites the document so that Apple's [swift-openapi-generator](https://github.com/apple/swift-openapi-generator) produces a correct, forward-compatible client. It walks the entire spec, so new endpoints and schemas are handled automatically with no allow-list to maintain.
 
 ### What Gets Patched
 
-The `Scripts/patch-openapi-spec.py` script removes `additionalProperties: false` from identification-related schemas:
+1. **Nullable unions → optional fields.** The CardSight API is OpenAPI 3.1 and models nullable fields as `anyOf: [<schema>, {"type": "null"}]`. swift-openapi-generator cannot represent the `{"type": "null"}` branch, so it emits a warning and **silently drops the entire property** — which is why response types like `PricingRecord`, `MarketplaceRecord`, and `ReleaseCalendarEntry` would otherwise be missing most of their fields. The script collapses each nullable union into its non-null schema and removes the property from its parent `required` list, so the generator renders it as a normal Swift optional that decodes JSON `null` correctly.
 
-- `AIIdentificationInput`
-- `IdentificationDataInput`
-- `CardDetailsInput`
-- `IdentifyCardResponseInput`
+2. **`additionalProperties: false` removed.** The generator enforces this strictly via `ensureNoAdditionalProperties`, so any field the API adds in the future causes a hard decode failure. Removing the constraint makes decoding forward-compatible — unknown fields are ignored. This follows the swift-openapi-generator maintainers' [official recommendation](https://github.com/apple/swift-openapi-generator/issues/608).
 
-This allows the SDK to gracefully ignore unknown fields in API responses, preventing decode errors when the API evolves.
+The script reports what it changed, e.g. `Patched spec: 88 nullable unions collapsed, 24 required fields relaxed, 165 additionalProperties:false removed`.
 
 ## Testing
 

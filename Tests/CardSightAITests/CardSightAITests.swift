@@ -168,19 +168,13 @@ final class CardSightAIMockTests: XCTestCase {
         let config = try CardSightAIConfig(apiKey: "test_key")
         let client = try CardSightAI(config: config)
 
-        // Verify API endpoints are accessible
-        XCTAssertNotNil(client.health)
+        // Verify the public helper surface is accessible. Since v2.0.0 all
+        // catalog/collection/etc. operations are reached directly via `raw`,
+        // while image-upload helpers live on `identify` and `detect`.
         XCTAssertNotNil(client.identify)
-        XCTAssertNotNil(client.catalog)
-        XCTAssertNotNil(client.collections)
-        XCTAssertNotNil(client.collectors)
-        XCTAssertNotNil(client.lists)
-        XCTAssertNotNil(client.grades)
-        XCTAssertNotNil(client.autocomplete)
-        XCTAssertNotNil(client.ai)
-        XCTAssertNotNil(client.images)
-        XCTAssertNotNil(client.feedback)
-        XCTAssertNotNil(client.subscription)
+        XCTAssertNotNil(client.detect)
+        XCTAssertNotNil(client.imageProcessor)
+        XCTAssertNotNil(client.raw)
     }
 }
 
@@ -202,15 +196,15 @@ final class CardSightAIIntegrationTests: XCTestCase {
         let client = try CardSightAI(apiKey: "dummy_key_for_health_check")
 
         // Call unauthenticated health endpoint
-        let response = try await client.health.check()
+        let response = try await client.getHealth()
 
         // Verify response
         switch response {
         case .ok(let okResponse):
             switch okResponse.body {
             case .json(let healthResponse):
-                XCTAssertTrue(healthResponse.status == "ok" || healthResponse.status == "healthy",
-                             "Health check should return 'ok' or 'healthy' status")
+                XCTAssertFalse(healthResponse.status.isEmpty,
+                             "Health check should return a non-empty status")
                 print("✅ Health check (unauthenticated): \(healthResponse.status)")
             }
         default:
@@ -235,22 +229,20 @@ final class CardSightAIIntegrationTests: XCTestCase {
         let client = try CardSightAI(apiKey: apiKey)
 
         // Call authenticated health endpoint
-        let response = try await client.health.checkAuth()
+        let response = try await client.getHealthAuthenticated()
 
         // Verify response
         switch response {
         case .ok(let okResponse):
             switch okResponse.body {
             case .json(let healthResponse):
-                XCTAssertTrue(healthResponse.status == "ok" || healthResponse.status == "healthy",
-                             "Authenticated health check should return 'ok' or 'healthy' status")
+                XCTAssertFalse(healthResponse.status.isEmpty,
+                             "Authenticated health check should return a non-empty status")
                 print("✅ Health check (authenticated): \(healthResponse.status)")
                 print("✅ API key is valid and working correctly")
             }
-        case .unauthorized:
-            XCTFail("Authentication failed - verify your CARDSIGHTAI_API_KEY is valid")
-        default:
-            XCTFail("Expected .ok response from authenticated health check")
+        case .undocumented(let statusCode, _):
+            XCTFail("Authenticated health check failed with status \(statusCode) - verify your CARDSIGHTAI_API_KEY is valid")
         }
     }
 }

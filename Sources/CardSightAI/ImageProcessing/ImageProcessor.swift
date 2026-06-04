@@ -151,10 +151,7 @@ public class ImageProcessor {
     public func optimizeForUpload(_ imageData: Data) async throws -> Data {
         // Check if this is HEIC/HEIF format and convert first
         if isHEICFormat(imageData) {
-            guard let imageSource = CGImageSourceCreateWithData(imageData as CFData, nil),
-                  let cgImage = CGImageSourceCreateImageAtIndex(imageSource, 0, nil) else {
-                throw CardSightAIError.imageProcessingError("Failed to read HEIC image data")
-            }
+            let cgImage = try decodeUprightCGImage(from: imageData)
 
             #if canImport(UIKit)
             let image = UIImage(cgImage: cgImage)
@@ -187,6 +184,68 @@ public class ImageProcessor {
     public func optimizeForUpload(_ url: URL) async throws -> Data {
         let data = try Data(contentsOf: url)
         return try await optimizeForUpload(data)
+    }
+
+    // MARK: - Upload Preparation
+
+    /// Resolve an image into JPEG `Data` using the SDK's standard upload policy.
+    ///
+    /// This centralizes the three-way choice every image-upload endpoint makes
+    /// (card identification, segment identification, card detection):
+    /// - `optimized == true`: aggressive optimization (smallest dimension 900px, 80% quality)
+    /// - `optimized == false` and `autoProcess == true`: standard processing via ``ImageProcessingOptions``
+    /// - otherwise: a direct JPEG encode with no resizing
+    ///
+    /// - Parameters:
+    ///   - optimized: Use aggressive optimization for faster uploads. Default: `true`
+    ///   - autoProcess: Apply standard processing when not optimizing. Default: `true`
+    /// - Returns: JPEG data ready to upload
+    #if canImport(UIKit)
+    public func prepareForUpload(_ image: UIImage, optimized: Bool = true, autoProcess: Bool = true) async throws -> Data {
+        if optimized {
+            return try await optimizeForUpload(image)
+        } else if autoProcess {
+            return try await processForUpload(image)
+        }
+        guard let data = image.jpegData(compressionQuality: 0.8) else {
+            throw CardSightAIError.imageProcessingError("Failed to convert image to JPEG")
+        }
+        return data
+    }
+    #endif
+
+    #if canImport(AppKit)
+    public func prepareForUpload(_ image: NSImage, optimized: Bool = true, autoProcess: Bool = true) async throws -> Data {
+        if optimized {
+            return try await optimizeForUpload(image)
+        } else if autoProcess {
+            return try await processForUpload(image)
+        }
+        guard let tiffData = image.tiffRepresentation,
+              let bitmapImage = NSBitmapImageRep(data: tiffData),
+              let data = bitmapImage.representation(using: .jpeg, properties: [.compressionFactor: 0.8]) else {
+            throw CardSightAIError.imageProcessingError("Failed to convert image to JPEG")
+        }
+        return data
+    }
+    #endif
+
+    public func prepareForUpload(_ imageData: Data, optimized: Bool = true, autoProcess: Bool = true) async throws -> Data {
+        if optimized {
+            return try await optimizeForUpload(imageData)
+        } else if autoProcess {
+            return try await processForUpload(imageData)
+        }
+        return imageData
+    }
+
+    public func prepareForUpload(_ url: URL, optimized: Bool = true, autoProcess: Bool = true) async throws -> Data {
+        if optimized {
+            return try await optimizeForUpload(url)
+        } else if autoProcess {
+            return try await processForUpload(url)
+        }
+        return try Data(contentsOf: url)
     }
 
     // MARK: - Private Methods
@@ -229,10 +288,7 @@ public class ImageProcessor {
     }
 
     private func convertHEICToJPEG(_ heicData: Data, options: ImageProcessingOptions) async throws -> Data {
-        guard let imageSource = CGImageSourceCreateWithData(heicData as CFData, nil),
-              let cgImage = CGImageSourceCreateImageAtIndex(imageSource, 0, nil) else {
-            throw CardSightAIError.imageProcessingError("Failed to read HEIC image data")
-        }
+        let cgImage = try decodeUprightCGImage(from: heicData)
 
         #if canImport(UIKit)
         let image = UIImage(cgImage: cgImage)
@@ -241,6 +297,46 @@ public class ImageProcessor {
         let image = NSImage(cgImage: cgImage, size: NSSize(width: cgImage.width, height: cgImage.height))
         return try await processForUpload(image, customOptions: options)
         #endif
+    }
+
+    /// Decodes a `CGImage` from encoded image data with its EXIF/container
+    /// orientation already applied, so the returned image is visually upright.
+    ///
+    /// `CGImageSourceCreateImageAtIndex` returns the raw pixel buffer and ignores
+    /// the orientation tag that HEIC photos from the iPhone camera carry, which
+    /// would otherwise upload landscape/portrait shots rotated or upside-down.
+    /// `CGImageSourceCreateThumbnailAtIndex` with `kCGImageSourceCreateThumbnailWithTransform`
+    /// bakes that orientation into the pixels. We request a "thumbnail" sized to
+    /// the full image so no resolution is lost (downsizing happens later, if
+    /// needed, in `resize`/`resizeBySmallestDimension`). This path uses only
+    /// ImageIO, so it works identically on iOS, macOS, tvOS, and watchOS.
+    private func decodeUprightCGImage(from data: Data) throws -> CGImage {
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil) else {
+            throw CardSightAIError.imageProcessingError("Failed to read HEIC image data")
+        }
+
+        let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any]
+        let pixelWidth = (properties?[kCGImagePropertyPixelWidth] as? Int) ?? 0
+        let pixelHeight = (properties?[kCGImagePropertyPixelHeight] as? Int) ?? 0
+
+        var thumbnailOptions: [CFString: Any] = [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+        ]
+        let maxPixelSize = max(pixelWidth, pixelHeight)
+        if maxPixelSize > 0 {
+            thumbnailOptions[kCGImageSourceThumbnailMaxPixelSize] = maxPixelSize
+        }
+
+        if let oriented = CGImageSourceCreateThumbnailAtIndex(source, 0, thumbnailOptions as CFDictionary) {
+            return oriented
+        }
+
+        // Fallback to the unoriented full image if the transform path is unavailable.
+        guard let cgImage = CGImageSourceCreateImageAtIndex(source, 0, nil) else {
+            throw CardSightAIError.imageProcessingError("Failed to read HEIC image data")
+        }
+        return cgImage
     }
 
     #if canImport(UIKit)

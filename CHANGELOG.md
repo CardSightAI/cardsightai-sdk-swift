@@ -5,6 +5,32 @@ All notable changes to the CardSight AI Swift SDK will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-06-03
+
+### Added
+- **15 new API endpoints** (79 → 94 operations), all available via `client.raw.{operationId}()`:
+  - **Pricing** — `getCardPricing` (completed-sales history with parallel/grade/period filters) and `getBulkPricing` (POST, multiple cards at once)
+  - **Marketplace** — `getCardMarketplace` (active listings)
+  - **Population** — `getCardPopulation`, `getSetPopulation`, `getReleasePopulation` (graded population reports)
+  - **Release Calendar** — `getReleaseCalendar` (upcoming releases with pre-order dates)
+  - **Catalog Search** — `searchCatalog` (global fuzzy search across cards/sets/releases/parallels)
+  - **Fields** — `getFields`, `getFieldById` (cross-TCG metadata fields)
+  - **Parallels** — `getParallel` (parallel detail by id)
+  - **Card Detection** — `detectCard` (lightweight presence check)
+  - **Segment Identification** — `identifyCardBySegment` (scope identification to a known segment)
+  - **Set Identifiability** — `listIdentifiableSets`, `checkSetIdentifiable` (quota-free pre-flight checks)
+- **`client.detect.card(_:)`** convenience helper for lightweight card-presence detection, with the same automatic image processing (HEIC conversion, resizing, optimization) as `identify.card`. Accepts `UIImage`/`NSImage`/`Data`/`URL`.
+- **`client.identify.cardBySegment(_:segment:)`** convenience helper to scope identification to a known segment (e.g. `"baseball"`). Accepts `UIImage`/`NSImage`/`Data`/`URL`.
+- **`ImageProcessor.prepareForUpload(_:optimized:autoProcess:)`** — public helper that centralizes the standard optimize/process/raw upload policy used by all image-upload endpoints.
+
+### Fixed
+- **HEIC orientation** — HEIC images are now rotated upright based on their EXIF/container orientation metadata during JPEG conversion. Previously `CGImageSourceCreateImageAtIndex` discarded the orientation tag, so rotated iPhone camera photos could upload sideways or upside-down. Decoding now uses `CGImageSourceCreateThumbnailAtIndex` with `kCGImageSourceCreateThumbnailWithTransform`, baking the orientation into the pixels at full resolution (ImageIO only, so it works on iOS, macOS, tvOS, and watchOS).
+- **Dropped nullable fields** — Response fields modeled as `anyOf: [<schema>, {type: null}]` (the OpenAPI 3.1 nullable idiom the API now emits) were being silently dropped by swift-openapi-generator, so types like `PricingRecord`, `MarketplaceRecord`, `ReleaseCalendarEntry`, and `PopulationGradeEntry` were missing most of their fields — and the strict `additionalProperties: false` on those objects made decoding real responses fail. The patch script now restores all 88 nullable fields as proper Swift optionals that correctly decode JSON `null`.
+
+### Changed
+- **`Scripts/patch-openapi-spec.py` generalized** — replaced the hand-maintained four-schema allow-list with two document-wide transforms: (1) collapse nullable `anyOf`/`oneOf` unions into optional non-null schemas (and relax the corresponding `required` entries), and (2) remove `additionalProperties: false` for forward-compatibility across all schemas. New endpoints are now handled automatically with no allow-list to maintain.
+- **Tests** updated for the v2.0.0 client surface (the stale `client.health`/`client.catalog`/… wrapper references were removed) and the current health operations (`getHealth`/`getHealthAuthenticated`).
+
 ## [2.1.3] - 2025-12-22
 
 ### Fixed
