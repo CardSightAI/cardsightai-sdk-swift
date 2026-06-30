@@ -5,6 +5,18 @@ All notable changes to the CardSight AI Swift SDK will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] - 2026-06-30
+
+### Added
+- **2 new search endpoints** (94 → 96 operations), all available via `client.raw.{operationId}()`:
+  - **Pricing** — `searchPricingByTitle` (`GET /v1/pricing/search`): free-text fuzzy search over marketplace listing titles for historical bid/ask pricing, including raw listings never matched to a canonical card. Params: `q` (required, 3–300 chars), `period` (e.g. `"7d"`/`"3m"`/`"1y"`/`"all"`), `listing_type` (`auction`/`fixed`/`both`), `limit` (≤500). Returns `PricingSearchResponse` (`query`, `results`, `meta`).
+  - **Marketplace** — `searchMarketplaceByTitle` (`GET /v1/marketplace/search`): free-text fuzzy search over titles of currently active listings. Params: `q` (required, 3–300 chars), `listing_type`, `limit` (≤500). Returns `MarketplaceSearchResponse` (`query`, `results`, `meta`).
+- New auto-generated response models: `PricingSearchResponse`/`PricingSearchRecord`/`PricingSearchQueryEcho`, `MarketplaceSearchResponse`/`MarketplaceSearchRecord`/`MarketplaceSearchQueryEcho`, `SearchMeta`, and shared `SearchMatchedCard`/`SearchGrade`/`CardSetContext`.
+
+### Changed
+- **`Segment`** now exposes an optional `shortname` (URL-friendly segment key, e.g. `"magic"`) usable with `identify.cardBySegment`. Additive, non-breaking.
+- Pricing/marketplace descriptions reworded to the bid (completed auction sales) / ask (Buy It Now asking prices) framing; `PricingCardContext.set` now shares the `CardSetContext` model. Wire format unchanged.
+
 ## [2.2.0] - 2026-06-03
 
 ### Added
@@ -296,6 +308,8 @@ let health = try await client.raw.getHealth()
 - Manual image upload for collection cards (OpenAPI schema limitation)
 - Platform-specific binary image retrieval (OpenAPI schema limitation)
 
+[2.3.0]: https://github.com/cardsightai/cardsightai-sdk-swift/compare/v2.2.0...v2.3.0
+[2.2.0]: https://github.com/cardsightai/cardsightai-sdk-swift/compare/v2.1.3...v2.2.0
 [2.1.3]: https://github.com/cardsightai/cardsightai-sdk-swift/compare/v2.1.2...v2.1.3
 [2.1.2]: https://github.com/cardsightai/cardsightai-sdk-swift/compare/v2.1.1...v2.1.2
 [2.1.1]: https://github.com/cardsightai/cardsightai-sdk-swift/compare/v2.1.0...v2.1.1

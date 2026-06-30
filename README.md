@@ -31,7 +31,7 @@ The most comprehensive baseball card identification and collection management pl
 | **Card Identification** | Identify cards from images using AI with automatic HEIC to JPEG conversion |
 | **Card Detection** | Fast, low-cost presence check (`detect.card`) without full identification |
 | **Catalog Search** | Global fuzzy search across 2M+ cards, sets, releases, and parallels |
-| **Pricing & Marketplace** | Completed-sales pricing history and active marketplace listings |
+| **Pricing & Marketplace** | Bid/ask pricing history and active marketplace listings, by card or free-text title search |
 | **Population Reports** | Graded population counts by card, set, or release |
 | **Release Calendar** | Upcoming releases with pre-order dates |
 | **Collections** | Manage owned card collections with analytics |
@@ -55,7 +55,7 @@ Add the following to your `Package.swift` file:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/cardsightai/cardsightai-sdk-swift.git", from: "2.2.0")
+    .package(url: "https://github.com/cardsightai/cardsightai-sdk-swift.git", from: "2.3.0")
 ]
 ```
 
@@ -373,6 +373,27 @@ if case .ok(let response) = marketplace {
         print("\(listing.title) — \(listing.price.map { "$\($0)" } ?? "no price") (\(listing.source))")
     }
 }
+
+// Free-text search of historical pricing by listing title
+// (spans many cards; includes raw listings never matched to a canonical card)
+let pricingHits = try await client.raw.searchPricingByTitle(
+    .init(query: .init(q: "1989 Upper Deck Griffey", period: "1y", listing_type: .both, limit: 50))
+)
+if case .ok(let response) = pricingHits {
+    for result in response.body.json.results {
+        print("\(result.title ?? "?") — $\(result.price) (\(result.source))")
+    }
+}
+
+// Free-text search of active marketplace listings by title (no period filter)
+let marketplaceHits = try await client.raw.searchMarketplaceByTitle(
+    .init(query: .init(q: "1989 Upper Deck Griffey", listing_type: .both, limit: 50))
+)
+if case .ok(let response) = marketplaceHits {
+    for result in response.body.json.results {
+        print("\(result.title) — \(result.price.map { "$\($0)" } ?? "no price") (\(result.source))")
+    }
+}
 ```
 
 ### Population Reports
@@ -574,7 +595,7 @@ let client = try CardSightAI(config: config)
 
 ✅ **100% Coverage Verified**
 
-The SDK provides complete coverage of all **94 CardSight AI REST API endpoints**:
+The SDK provides complete coverage of all **96 CardSight AI REST API endpoints**:
 
 | Category | Endpoints | Coverage | SDK Access |
 |----------|-----------|----------|------------|
@@ -582,8 +603,8 @@ The SDK provides complete coverage of all **94 CardSight AI REST API endpoints**
 | **Card Identification** | 4 | 100% | `client.identify.card()`, `client.identify.cardBySegment()`, `client.raw.listIdentifiableSets()`, `client.raw.checkSetIdentifiable()` |
 | **Card Detection** | 1 | 100% | `client.detect.card()` |
 | **Catalog** | 21 | 100% | `client.raw.getCards()`, `client.raw.searchCatalog()`, `client.raw.getFields()`, etc. |
-| **Pricing** | 2 | 100% | `client.raw.getCardPricing()`, `client.raw.getBulkPricing()` |
-| **Marketplace** | 1 | 100% | `client.raw.getCardMarketplace()` |
+| **Pricing** | 3 | 100% | `client.raw.getCardPricing()`, `client.raw.getBulkPricing()`, `client.raw.searchPricingByTitle()` |
+| **Marketplace** | 2 | 100% | `client.raw.getCardMarketplace()`, `client.raw.searchMarketplaceByTitle()` |
 | **Population** | 3 | 100% | `client.raw.getCardPopulation()`, `client.raw.getSetPopulation()`, `client.raw.getReleasePopulation()` |
 | **Release Calendar** | 1 | 100% | `client.raw.getReleaseCalendar()` |
 | **Collections** | 23 | 100% | `client.raw.getCollections()`, `client.raw.createCollection()`, etc. |
@@ -595,7 +616,7 @@ The SDK provides complete coverage of all **94 CardSight AI REST API endpoints**
 | **Images** | 4 | 100% | `client.raw.getCardImage()`, etc. |
 | **Feedback** | 8 | 100% | `client.raw.submitGeneralFeedback()`, etc. |
 | **Subscription** | 1 | 100% | `client.raw.getSubscription()` |
-| **TOTAL** | **94** | **100%** | - |
+| **TOTAL** | **96** | **100%** | - |
 
 ### Special Features
 

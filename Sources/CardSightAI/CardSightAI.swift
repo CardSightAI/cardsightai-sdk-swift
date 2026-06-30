@@ -190,9 +190,9 @@ public class CardSightAI {
     /// let companies = try await client.getGradingCompanies()
     /// ```
     ///
-    /// All 94 API operations are available as methods on this client with clean names like:
+    /// All 96 API operations are available as methods on this client with clean names like:
     /// - `getCards`, `getCard`, `getSets`, `getReleases`, `searchCatalog`
-    /// - `getCardPricing`, `getCardMarketplace`, `getCardPopulation`, `getReleaseCalendar`
+    /// - `getCardPricing`, `getCardMarketplace`, `searchPricingByTitle`, `searchMarketplaceByTitle`, `getCardPopulation`, `getReleaseCalendar`
     /// - `getCollections`, `createCollection`, `updateCollection`
     /// - `getGradingCompanies`, `getGradingTypes`, `getGrades`
     /// - And many more...
