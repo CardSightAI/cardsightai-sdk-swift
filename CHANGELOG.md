@@ -5,6 +5,17 @@ All notable changes to the CardSight AI Swift SDK will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.0] - 2026-07-15
+
+### Added
+- **Pricing history paging** — `as_of_date` query param on `GET /v1/pricing/{card_id}` (500-row cap surfaced via an advisory `messages` array).
+- **Catalog `/N` slash search** — `SearchResult` gains `numberedTo`.
+- **Server advisory messages** — `ServerMessage[]` `messages` arrays on `PaginatedCardsResponse`, `CatalogSearchResponse`, and `PricingResponse`.
+
+### Changed
+- Refreshed the committed OpenAPI spec; regenerated types on build.
+- Bulk pricing (`getBulkPricing`) per-card `limit` documented maximum is now 100 (default 25). For a card's full history use `getCardPricing` with `as_of_date` paging.
+
 ## [2.3.0] - 2026-06-30
 
 ### Added
