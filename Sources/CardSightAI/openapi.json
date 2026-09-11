@@ -468,8 +468,8 @@
                         "minimum": 1
                     },
                     "buyPrice": {
-                        "type": "string",
-                        "description": "Purchase price (null to remove)"
+                        "description": "Purchase price (null to remove)",
+                        "type": "string"
                     },
                     "buyDate": {
                         "type": "string",
@@ -477,12 +477,12 @@
                         "description": "Purchase date (null to remove)"
                     },
                     "sellPrice": {
-                        "type": "string",
-                        "description": "Listed selling price (null to remove)"
+                        "description": "Listed selling price (null to remove)",
+                        "type": "string"
                     },
                     "soldPrice": {
-                        "type": "string",
-                        "description": "Actual sold price (null to remove)"
+                        "description": "Actual sold price (null to remove)",
+                        "type": "string"
                     },
                     "soldDate": {
                         "type": "string",
@@ -1362,14 +1362,21 @@
                     "status": {
                         "type": "string",
                         "enum": [
-                            "not_reviewed",
+                            "new",
                             "under_review",
+                            "confirmed_bug",
+                            "enhancement_backlog",
+                            "enhancement_planned",
+                            "released",
+                            "not_an_issue",
+                            "closed",
+                            "not_reviewed",
                             "fixed",
                             "wont_fix",
                             "duplicate",
                             "need_info"
                         ],
-                        "description": "Current review status of the feedback"
+                        "description": "Current review status of the feedback. Newly submitted feedback starts as new; the remaining values are set by our review team. The values not_reviewed, fixed, wont_fix, duplicate, and need_info are deprecated and appear only on feedback submitted before August 2026."
                     },
                     "created_at": {
                         "type": "string",
@@ -1448,24 +1455,7 @@
                 "type": "object",
                 "properties": {
                     "id": {
-                        "description": "UUID of the suggested card",
-                        "type": "string"
-                    },
-                    "setName": {
-                        "description": "Set name for the suggested card",
-                        "type": "string"
-                    },
-                    "fields": {
-                        "description": "Key-value field properties for the suggested card. Omitted when the card has no fields.",
-                        "$ref": "#/components/schemas/FieldValuesInput"
-                    }
-                }
-            },
-            "CardDetailsInput": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "description": "UUID of the identified card. Present only for exact card matches.",
+                        "description": "UUID of the card. Present only for exact card matches.",
                         "type": "string"
                     },
                     "segmentId": {
@@ -1525,16 +1515,138 @@
                         "description": "UUID of the parent card when this card is a variation. Omitted if the card is not a variation.",
                         "type": "string"
                     },
-                    "parallel": {
-                        "description": "Parallel variant info. Present only for exact card matches with an identified parallel.",
-                        "$ref": "#/components/schemas/ParallelSummaryInput"
+                    "fields": {
+                        "description": "Key-value field properties (e.g., HP, Rarity, Artist). May include a \"CARD_LANGUAGE\" entry with the ISO 639-1 code of the scanned card language (e.g., \"ja\"). Omitted when there are no fields.",
+                        "$ref": "#/components/schemas/FieldValuesInput"
+                    }
+                }
+            },
+            "ParallelSuggestionInput": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+                        "description": "Unique identifier for the parallel type. Format: UUID v4. This ID represents the parallel variant, not individual cards."
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Name of the parallel variant. Examples: \"Gold Refractor\", \"Black Prizm\", \"Orange\". Describes the visual variant or rarity tier."
+                    },
+                    "description": {
+                        "description": "Additional details about the parallel such as print run, special features, or visual description. May be null.",
+                        "type": "string"
+                    },
+                    "isPartial": {
+                        "description": "Present and true only if this parallel applies to specific cards (e.g., cards 1-400 of a 800-card set). Omitted if parallel applies to the entire set.",
+                        "type": "boolean",
+                        "const": true
+                    },
+                    "numberedTo": {
+                        "description": "Limited print run number for this parallel",
+                        "type": "number"
+                    },
+                    "cards": {
+                        "description": "Card UUIDs that have this parallel. Only present when isPartial is true.",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+                            "description": "UUID"
+                        }
+                    },
+                    "confidence": {
+                        "description": "How strongly this parallel is supported for the scanned card. Assessed per entry, independent of the entry's position in the list. Present when available while this field is in beta; a missing value means not assessed, not Low.",
+                        "type": "string",
+                        "enum": [
+                            "High",
+                            "Medium",
+                            "Low"
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "name"
+                ]
+            },
+            "CardDetailsInput": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "description": "UUID of the card. Present only for exact card matches.",
+                        "type": "string"
+                    },
+                    "segmentId": {
+                        "description": "UUID of the segment. Present for both exact card and set-level matches.",
+                        "type": "string"
+                    },
+                    "releaseId": {
+                        "description": "UUID of the release. Present for both exact card and set-level matches.",
+                        "type": "string"
+                    },
+                    "setId": {
+                        "description": "UUID of the set. Present for both exact card and set-level matches.",
+                        "type": "string"
+                    },
+                    "year": {
+                        "description": "Release year from catalog (e.g., \"2023\", \"1989\")",
+                        "type": "string"
+                    },
+                    "manufacturer": {
+                        "description": "Card manufacturer from catalog (e.g., \"Topps\", \"Panini\", \"Upper Deck\")",
+                        "type": "string"
+                    },
+                    "releaseName": {
+                        "description": "Release/product name from catalog (e.g., \"Topps Chrome\", \"Prizm Basketball\")",
+                        "type": "string"
+                    },
+                    "setName": {
+                        "description": "Set name from catalog (e.g., \"Base Set\", \"Rookie Variations\")",
+                        "type": "string"
+                    },
+                    "name": {
+                        "description": "Player or subject name. Present only for exact card matches.",
+                        "type": "string"
+                    },
+                    "number": {
+                        "description": "Card number. Present only for exact card matches.",
+                        "type": "string"
+                    },
+                    "description": {
+                        "description": "Descriptive text for the card when available. Omitted if no description exists.",
+                        "type": "string"
+                    },
+                    "numberedTo": {
+                        "description": "Print run for numbered cards (e.g., 25 for a /25 card). Omitted if the card is not numbered.",
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                    },
+                    "attributes": {
+                        "description": "Notable attributes of the card (e.g., [\"Rookie\", \"Autograph\"]). Omitted if the card has no attributes.",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "variationOf": {
+                        "description": "UUID of the parent card when this card is a variation. Omitted if the card is not a variation.",
+                        "type": "string"
                     },
                     "fields": {
-                        "description": "Key-value field properties (e.g., HP, Rarity, Artist). Omitted when the card has no fields.",
+                        "description": "Key-value field properties (e.g., HP, Rarity, Artist). May include a \"CARD_LANGUAGE\" entry with the ISO 639-1 code of the scanned card language (e.g., \"ja\"). Omitted when there are no fields.",
                         "$ref": "#/components/schemas/FieldValuesInput"
                     },
+                    "parallelSuggestions": {
+                        "description": "(beta) Possible parallels for this card, each carrying a `confidence` tier when available. Order is the identification engine's ranking, best match first; `confidence` is the strength of evidence behind that individual entry and does not re-order the list. The two are independent, so a later entry may carry a higher confidence than an earlier one. Present whenever there is any parallel evidence: a single High-confidence entry when one parallel was identified, or several entries when more than one remains possible. Omitted when there is nothing to suggest.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ParallelSuggestionInput"
+                        }
+                    },
                     "suggestions": {
-                        "description": "Alternative card matches when multiple reprints score similarly. Omitted when there are no suggestions.",
+                        "description": "Possible alternative card matches, best match first. Each entry is a full card record with the same fields as `card`. Included only when `confidence` is Medium or Low; omitted for High-confidence identifications and when there are no alternatives.",
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/CardSuggestionInput"
@@ -2012,8 +2124,8 @@
                         "description": "Display name of the segment. Examples: \"Sports\", \"Entertainment\", \"Gaming\". Used for categorizing releases and filtering."
                     },
                     "shortname": {
-                        "type": "string",
-                        "description": "Short, URL-friendly key for the segment, usable in place of the name or UUID on segment-specific routes such as /v1/identify/card/{segment} (e.g. \"magic\" for \"Magic: The Gathering\"). Null when no shortname is set."
+                        "description": "Short, URL-friendly key for the segment, usable in place of the name or UUID on segment-specific routes such as /v1/identify/card/{segment} (e.g. \"magic\" for \"Magic: The Gathering\"). Null when no shortname is set.",
+                        "type": "string"
                     },
                     "is_identifiable": {
                         "type": "boolean",
@@ -3743,8 +3855,8 @@
                         "type": "string"
                     },
                     "numberedTo": {
-                        "type": "number",
-                        "description": "Limited print run number for this parallel. Null for unlimited parallels."
+                        "description": "Limited print run number for this parallel. Null for unlimited parallels.",
+                        "type": "number"
                     }
                 },
                 "required": [
@@ -3889,7 +4001,7 @@
                     },
                     "relevance": {
                         "type": "number",
-                        "description": "Relevance score combining full-text search rank and fuzzy similarity. Higher values indicate stronger matches. Results are sorted by this score descending."
+                        "description": "Relevance score for ordering results. Higher values indicate stronger matches; results are sorted by this score descending. The value is opaque and order-only \u2014 its magnitude is not an absolute scale and may change between backend versions."
                     },
                     "year": {
                         "description": "Release year associated with this result.",
@@ -3916,6 +4028,22 @@
                         "type": "integer",
                         "exclusiveMinimum": 0,
                         "maximum": 9007199254740991
+                    },
+                    "segmentName": {
+                        "description": "Segment name for this result (e.g. \"Baseball\").",
+                        "type": "string"
+                    },
+                    "cardNumber": {
+                        "description": "Printed card number. Present on card results when available.",
+                        "type": "string"
+                    },
+                    "matchKind": {
+                        "description": "Present on every result of the page only when close-spelling (fuzzy) matching engaged for this request: \"exact\" results matched the query directly and always sort before \"fuzzy\" results. Omitted entirely when fuzzy matching did not engage.",
+                        "type": "string",
+                        "enum": [
+                            "exact",
+                            "fuzzy"
+                        ]
                     }
                 },
                 "required": [
@@ -3992,8 +4120,8 @@
                         "description": "Name of the grading company (e.g., PSA, BGS, SGC, CGC)"
                     },
                     "description": {
-                        "type": "string",
-                        "description": "Detailed description of the grading company and its services"
+                        "description": "Detailed description of the grading company and its services",
+                        "type": "string"
                     }
                 },
                 "required": [
@@ -4025,8 +4153,8 @@
                         "description": "Name of the grading type (e.g., Regular, Crossover, Black Label)"
                     },
                     "description": {
-                        "type": "string",
-                        "description": "Detailed description of what this grading type offers or represents"
+                        "description": "Detailed description of what this grading type offers or represents",
+                        "type": "string"
                     }
                 },
                 "required": [
@@ -4070,8 +4198,8 @@
                         "description": "The grade value as a string (e.g., \"10\", \"9.5\", \"8\") to support decimal and \"Authentic\" grades"
                     },
                     "condition": {
-                        "type": "string",
-                        "description": "The condition descriptor for this grade (e.g., \"GEM MINT\", \"MINT\", \"PRISTINE\")"
+                        "description": "The condition descriptor for this grade (e.g., \"GEM MINT\", \"MINT\", \"PRISTINE\")",
+                        "type": "string"
                     }
                 },
                 "required": [
@@ -4214,8 +4342,8 @@
                 "type": "object",
                 "properties": {
                     "title": {
-                        "type": "string",
-                        "description": "Listing title from marketplace"
+                        "description": "Listing title from marketplace",
+                        "type": "string"
                     },
                     "price": {
                         "type": "number",
@@ -4223,8 +4351,8 @@
                         "description": "Price in USD. For auctions this is the final sale price (the \"bid\" side); for fixed/Buy It Now this is the seller's asking price (the \"ask\" side) and is NOT necessarily a completed sale."
                     },
                     "date": {
-                        "type": "string",
-                        "description": "Date the listing ended, in ISO 8601 format"
+                        "description": "Date the listing ended, in ISO 8601 format",
+                        "type": "string"
                     },
                     "source": {
                         "type": "string",
@@ -4239,12 +4367,12 @@
                         "description": "Listing type: \"auction\" = a completed auction sale (bid side), \"fixed\" = a Buy It Now asking price (ask side)."
                     },
                     "url": {
-                        "type": "string",
-                        "description": "URL to the original listing"
+                        "description": "URL to the original listing",
+                        "type": "string"
                     },
                     "image_url": {
-                        "type": "string",
-                        "description": "Primary image URL for the listing"
+                        "description": "Primary image URL for the listing",
+                        "type": "string"
                     },
                     "parallel_id": {
                         "type": "string",
@@ -4253,8 +4381,8 @@
                         "description": "Parallel variant UUID. Null for base card listings."
                     },
                     "parallel_name": {
-                        "type": "string",
-                        "description": "Parallel variant name. Null for base card listings."
+                        "description": "Parallel variant name. Null for base card listings.",
+                        "type": "string"
                     }
                 },
                 "required": [
@@ -4288,20 +4416,20 @@
                         "description": "Type of listing"
                     },
                     "url": {
-                        "type": "string",
-                        "description": "URL to the listing"
+                        "description": "URL to the listing",
+                        "type": "string"
                     },
                     "image_url": {
-                        "type": "string",
-                        "description": "Primary image URL"
+                        "description": "Primary image URL",
+                        "type": "string"
                     },
                     "condition": {
-                        "type": "string",
-                        "description": "Condition description from seller"
+                        "description": "Condition description from seller",
+                        "type": "string"
                     },
                     "end_date": {
-                        "type": "string",
-                        "description": "Listing end date in ISO 8601 format"
+                        "description": "Listing end date in ISO 8601 format",
+                        "type": "string"
                     },
                     "bid_count": {
                         "type": "integer",
@@ -4316,8 +4444,8 @@
                         "description": "Parallel variant UUID. Null for base card listings."
                     },
                     "parallel_name": {
-                        "type": "string",
-                        "description": "Parallel variant name. Null for base card listings."
+                        "description": "Parallel variant name. Null for base card listings.",
+                        "type": "string"
                     }
                 },
                 "required": [
@@ -4368,8 +4496,8 @@
                         "description": "Card name/subject"
                     },
                     "number": {
-                        "type": "string",
-                        "description": "Card number in set"
+                        "description": "Card number in set",
+                        "type": "string"
                     },
                     "set": {
                         "description": "Set context",
@@ -4464,8 +4592,8 @@
                         "description": "Breakdown by data source"
                     },
                     "last_sale_date": {
-                        "type": "string",
-                        "description": "Date of most recent sale"
+                        "description": "Date of most recent sale",
+                        "type": "string"
                     },
                     "total_records": {
                         "type": "integer",
@@ -4856,8 +4984,8 @@
                         "description": "Card name/subject"
                     },
                     "number": {
-                        "type": "string",
-                        "description": "Card number in set"
+                        "description": "Card number in set",
+                        "type": "string"
                     },
                     "set": {
                         "description": "Set context",
@@ -4905,8 +5033,8 @@
                 "type": "object",
                 "properties": {
                     "title": {
-                        "type": "string",
-                        "description": "Listing title from marketplace"
+                        "description": "Listing title from marketplace",
+                        "type": "string"
                     },
                     "price": {
                         "type": "number",
@@ -4914,8 +5042,8 @@
                         "description": "Price in USD. For auctions this is the final sale price (the \"bid\" side); for fixed/Buy It Now this is the seller's asking price (the \"ask\" side) and is NOT necessarily a completed sale."
                     },
                     "date": {
-                        "type": "string",
-                        "description": "Date the listing ended, in ISO 8601 format"
+                        "description": "Date the listing ended, in ISO 8601 format",
+                        "type": "string"
                     },
                     "source": {
                         "type": "string",
@@ -4930,12 +5058,12 @@
                         "description": "Listing type: \"auction\" = a completed auction sale (bid side), \"fixed\" = a Buy It Now asking price (ask side)."
                     },
                     "url": {
-                        "type": "string",
-                        "description": "URL to the original listing"
+                        "description": "URL to the original listing",
+                        "type": "string"
                     },
                     "image_url": {
-                        "type": "string",
-                        "description": "Primary image URL for the listing"
+                        "description": "Primary image URL for the listing",
+                        "type": "string"
                     },
                     "parallel_id": {
                         "type": "string",
@@ -4944,8 +5072,8 @@
                         "description": "Parallel variant UUID. Null for base card listings."
                     },
                     "parallel_name": {
-                        "type": "string",
-                        "description": "Parallel variant name. Null for base card listings."
+                        "description": "Parallel variant name. Null for base card listings.",
+                        "type": "string"
                     },
                     "matched_card": {
                         "description": "Canonical card this listing matched. Omitted when the listing is unmatched.",
@@ -4987,20 +5115,20 @@
                         "description": "Type of listing"
                     },
                     "url": {
-                        "type": "string",
-                        "description": "URL to the listing"
+                        "description": "URL to the listing",
+                        "type": "string"
                     },
                     "image_url": {
-                        "type": "string",
-                        "description": "Primary image URL"
+                        "description": "Primary image URL",
+                        "type": "string"
                     },
                     "condition": {
-                        "type": "string",
-                        "description": "Condition description from seller"
+                        "description": "Condition description from seller",
+                        "type": "string"
                     },
                     "end_date": {
-                        "type": "string",
-                        "description": "Listing end date in ISO 8601 format"
+                        "description": "Listing end date in ISO 8601 format",
+                        "type": "string"
                     },
                     "bid_count": {
                         "type": "integer",
@@ -5015,8 +5143,8 @@
                         "description": "Parallel variant UUID. Null for base card listings."
                     },
                     "parallel_name": {
-                        "type": "string",
-                        "description": "Parallel variant name. Null for base card listings."
+                        "description": "Parallel variant name. Null for base card listings.",
+                        "type": "string"
                     },
                     "matched_card": {
                         "description": "Canonical card this listing matched. Omitted when the listing is unmatched.",
@@ -5164,6 +5292,241 @@
                     "meta"
                 ]
             },
+            "CandleStatsInput": {
+                "type": "object",
+                "properties": {
+                    "mean": {
+                        "type": "number",
+                        "minimum": 0,
+                        "description": "Arithmetic mean listing price in USD for this bucket. For auction candles this aggregates final sale prices; for fixed candles it aggregates Buy It Now asking prices (not necessarily completed sales)."
+                    },
+                    "median": {
+                        "type": "number",
+                        "minimum": 0,
+                        "description": "Median listing price in USD for this bucket"
+                    },
+                    "high": {
+                        "type": "number",
+                        "minimum": 0,
+                        "description": "Highest listing price in USD in this bucket"
+                    },
+                    "low": {
+                        "type": "number",
+                        "minimum": 0,
+                        "description": "Lowest listing price in USD in this bucket"
+                    },
+                    "count": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991,
+                        "description": "Number of listings in this bucket for this listing type (after outlier filtering)"
+                    }
+                },
+                "required": [
+                    "mean",
+                    "median",
+                    "high",
+                    "low",
+                    "count"
+                ]
+            },
+            "CandlePeriodInput": {
+                "type": "object",
+                "properties": {
+                    "period_start": {
+                        "type": "string",
+                        "description": "Bucket start date (YYYY-MM-DD): the UTC calendar day, the Monday of the ISO week, or the 1st of the month, depending on interval."
+                    },
+                    "types": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "$ref": "#/components/schemas/CandleStatsInput"
+                        },
+                        "description": "Stats keyed by listing type; new listing types appear as additive keys. Currently \"auction\" (completed auction sales \u2014 the bid side) and \"fixed\" (Buy It Now asking prices \u2014 the ask side, not necessarily completed sales). A type with no listings in this bucket is absent from the map."
+                    }
+                },
+                "required": [
+                    "period_start",
+                    "types"
+                ]
+            },
+            "TimeseriesTypeTotalsInput": {
+                "type": "object",
+                "properties": {
+                    "total_count": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991,
+                        "description": "Listings included across all candles for this listing type (after outlier filtering); equals the sum of the per-candle counts."
+                    },
+                    "filtered_count": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991,
+                        "description": "Listings removed by the outlier filter for this listing type. Pre-filter total = total_count + filtered_count."
+                    }
+                },
+                "required": [
+                    "total_count",
+                    "filtered_count"
+                ]
+            },
+            "TimeseriesQueryEchoInput": {
+                "type": "object",
+                "properties": {
+                    "interval": {
+                        "type": "string",
+                        "description": "Rollup bucket size applied"
+                    },
+                    "periods": {
+                        "type": "integer",
+                        "exclusiveMinimum": 0,
+                        "maximum": 9007199254740991,
+                        "description": "Effective bucket count (the service applies per-interval defaults when omitted and clamps oversized values)"
+                    },
+                    "as_of_date": {
+                        "type": "string",
+                        "description": "Effective viewpoint date (UTC) the window ends on"
+                    },
+                    "listing_type": {
+                        "type": "string",
+                        "description": "Listing type filter applied"
+                    },
+                    "parallel_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                        "description": "Parallel UUID filter applied"
+                    },
+                    "grade_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                        "description": "Grade UUID filter applied"
+                    }
+                },
+                "required": [
+                    "interval",
+                    "periods",
+                    "as_of_date",
+                    "listing_type"
+                ]
+            },
+            "RawTimeseriesSectionInput": {
+                "type": "object",
+                "properties": {
+                    "candles": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CandlePeriodInput"
+                        },
+                        "description": "Chronological buckets computed from ungraded listings only, oldest first. A bucket with no listings in any requested type is omitted entirely; empty when the card has no ungraded listings in the window, or when the grade_id filter pins a specific grade (which excludes ungraded listings)."
+                    },
+                    "totals": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "$ref": "#/components/schemas/TimeseriesTypeTotalsInput"
+                        },
+                        "description": "Whole-window counts for ungraded listings, keyed by listing type. A type with no listings across the window is omitted; a type can appear with total_count 0 when all of its listings were removed by the outlier filter."
+                    }
+                },
+                "required": [
+                    "candles",
+                    "totals"
+                ]
+            },
+            "TimeseriesGradeGroupInput": {
+                "type": "object",
+                "properties": {
+                    "grade_value": {
+                        "type": "string",
+                        "description": "Grade value (e.g., \"10\", \"9.5\")"
+                    },
+                    "grade_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                        "description": "Grade UUID"
+                    },
+                    "candles": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CandlePeriodInput"
+                        },
+                        "description": "Chronological buckets computed from this grade's listings only, oldest first. A bucket with no listings in any requested type is omitted entirely."
+                    },
+                    "totals": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "$ref": "#/components/schemas/TimeseriesTypeTotalsInput"
+                        },
+                        "description": "Whole-window counts for this grade, keyed by listing type. A type with no listings across the window is omitted; a type can appear with total_count 0 when all of its listings were removed by the outlier filter."
+                    }
+                },
+                "required": [
+                    "grade_value",
+                    "grade_id",
+                    "candles",
+                    "totals"
+                ]
+            },
+            "TimeseriesCompanyGroupInput": {
+                "type": "object",
+                "properties": {
+                    "company_name": {
+                        "type": "string",
+                        "description": "Grading company name (e.g., \"PSA\")"
+                    },
+                    "company_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                        "description": "Grading company UUID"
+                    },
+                    "grades": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TimeseriesGradeGroupInput"
+                        },
+                        "description": "Per-grade candle series for this company"
+                    }
+                },
+                "required": [
+                    "company_name",
+                    "company_id",
+                    "grades"
+                ]
+            },
+            "TimeseriesResponseInput": {
+                "type": "object",
+                "properties": {
+                    "card": {
+                        "description": "Card context information",
+                        "$ref": "#/components/schemas/PricingCardContextInput"
+                    },
+                    "query": {
+                        "description": "Echo of query parameters applied (effective values)",
+                        "$ref": "#/components/schemas/TimeseriesQueryEchoInput"
+                    },
+                    "raw": {
+                        "description": "Candle series computed from ungraded listings only. Always present; empty candles/totals when the card has no ungraded listings in the window, or when the grade_id filter pins a specific grade (which excludes ungraded listings \u2014 pass grade_id \"null\" for ungraded only).",
+                        "$ref": "#/components/schemas/RawTimeseriesSectionInput"
+                    },
+                    "graded": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TimeseriesCompanyGroupInput"
+                        },
+                        "description": "Per-grade candle series grouped by grading company, so graded and ungraded prices never blend into one candle range. Grades with no listings in the window are omitted; empty when the card has no graded listings in the window. When the grade_id filter pins a specific grade, this contains at most that one grade."
+                    }
+                },
+                "required": [
+                    "card",
+                    "query",
+                    "raw",
+                    "graded"
+                ]
+            },
             "ReleaseCalendarEntryInput": {
                 "type": "object",
                 "properties": {
@@ -5178,16 +5541,16 @@
                         "description": "Name of the release"
                     },
                     "year": {
-                        "type": "string",
-                        "description": "Release year"
+                        "description": "Release year",
+                        "type": "string"
                     },
                     "release_date": {
-                        "type": "string",
-                        "description": "Expected or actual release date (YYYY-MM-DD)"
+                        "description": "Expected or actual release date (YYYY-MM-DD)",
+                        "type": "string"
                     },
                     "pre_order_date": {
-                        "type": "string",
-                        "description": "Date when pre-orders open (YYYY-MM-DD)"
+                        "description": "Date when pre-orders open (YYYY-MM-DD)",
+                        "type": "string"
                     },
                     "segment_id": {
                         "type": "string",
@@ -5267,8 +5630,8 @@
                         "description": "Grade value (e.g. \"10\", \"9.5\")"
                     },
                     "condition": {
-                        "type": "string",
-                        "description": "Condition descriptor (e.g. \"Gem Mint\")"
+                        "description": "Condition descriptor (e.g. \"Gem Mint\")",
+                        "type": "string"
                     },
                     "population": {
                         "type": "integer",
@@ -6072,8 +6435,8 @@
                         "minimum": 1
                     },
                     "buyPrice": {
-                        "type": "string",
-                        "description": "Purchase price (null to remove)"
+                        "description": "Purchase price (null to remove)",
+                        "type": "string"
                     },
                     "buyDate": {
                         "type": "string",
@@ -6081,12 +6444,12 @@
                         "description": "Purchase date (null to remove)"
                     },
                     "sellPrice": {
-                        "type": "string",
-                        "description": "Listed selling price (null to remove)"
+                        "description": "Listed selling price (null to remove)",
+                        "type": "string"
                     },
                     "soldPrice": {
-                        "type": "string",
-                        "description": "Actual sold price (null to remove)"
+                        "description": "Actual sold price (null to remove)",
+                        "type": "string"
                     },
                     "soldDate": {
                         "type": "string",
@@ -6967,14 +7330,21 @@
                     "status": {
                         "type": "string",
                         "enum": [
-                            "not_reviewed",
+                            "new",
                             "under_review",
+                            "confirmed_bug",
+                            "enhancement_backlog",
+                            "enhancement_planned",
+                            "released",
+                            "not_an_issue",
+                            "closed",
+                            "not_reviewed",
                             "fixed",
                             "wont_fix",
                             "duplicate",
                             "need_info"
                         ],
-                        "description": "Current review status of the feedback"
+                        "description": "Current review status of the feedback. Newly submitted feedback starts as new; the remaining values are set by our review team. The values not_reviewed, fixed, wont_fix, duplicate, and need_info are deprecated and appear only on feedback submitted before August 2026."
                     },
                     "created_at": {
                         "type": "string",
@@ -7053,24 +7423,7 @@
                 "type": "object",
                 "properties": {
                     "id": {
-                        "description": "UUID of the suggested card",
-                        "type": "string"
-                    },
-                    "setName": {
-                        "description": "Set name for the suggested card",
-                        "type": "string"
-                    },
-                    "fields": {
-                        "description": "Key-value field properties for the suggested card. Omitted when the card has no fields.",
-                        "$ref": "#/components/schemas/FieldValues"
-                    }
-                }
-            },
-            "CardDetails": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "description": "UUID of the identified card. Present only for exact card matches.",
+                        "description": "UUID of the card. Present only for exact card matches.",
                         "type": "string"
                     },
                     "segmentId": {
@@ -7130,16 +7483,138 @@
                         "description": "UUID of the parent card when this card is a variation. Omitted if the card is not a variation.",
                         "type": "string"
                     },
-                    "parallel": {
-                        "description": "Parallel variant info. Present only for exact card matches with an identified parallel.",
-                        "$ref": "#/components/schemas/ParallelSummary"
+                    "fields": {
+                        "description": "Key-value field properties (e.g., HP, Rarity, Artist). May include a \"CARD_LANGUAGE\" entry with the ISO 639-1 code of the scanned card language (e.g., \"ja\"). Omitted when there are no fields.",
+                        "$ref": "#/components/schemas/FieldValues"
+                    }
+                }
+            },
+            "ParallelSuggestion": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+                        "description": "Unique identifier for the parallel type. Format: UUID v4. This ID represents the parallel variant, not individual cards."
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Name of the parallel variant. Examples: \"Gold Refractor\", \"Black Prizm\", \"Orange\". Describes the visual variant or rarity tier."
+                    },
+                    "description": {
+                        "description": "Additional details about the parallel such as print run, special features, or visual description. May be null.",
+                        "type": "string"
+                    },
+                    "isPartial": {
+                        "description": "Present and true only if this parallel applies to specific cards (e.g., cards 1-400 of a 800-card set). Omitted if parallel applies to the entire set.",
+                        "type": "boolean",
+                        "const": true
+                    },
+                    "numberedTo": {
+                        "description": "Limited print run number for this parallel",
+                        "type": "number"
+                    },
+                    "cards": {
+                        "description": "Card UUIDs that have this parallel. Only present when isPartial is true.",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+                            "description": "UUID"
+                        }
+                    },
+                    "confidence": {
+                        "description": "How strongly this parallel is supported for the scanned card. Assessed per entry, independent of the entry's position in the list. Present when available while this field is in beta; a missing value means not assessed, not Low.",
+                        "type": "string",
+                        "enum": [
+                            "High",
+                            "Medium",
+                            "Low"
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "name"
+                ]
+            },
+            "CardDetails": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "description": "UUID of the card. Present only for exact card matches.",
+                        "type": "string"
+                    },
+                    "segmentId": {
+                        "description": "UUID of the segment. Present for both exact card and set-level matches.",
+                        "type": "string"
+                    },
+                    "releaseId": {
+                        "description": "UUID of the release. Present for both exact card and set-level matches.",
+                        "type": "string"
+                    },
+                    "setId": {
+                        "description": "UUID of the set. Present for both exact card and set-level matches.",
+                        "type": "string"
+                    },
+                    "year": {
+                        "description": "Release year from catalog (e.g., \"2023\", \"1989\")",
+                        "type": "string"
+                    },
+                    "manufacturer": {
+                        "description": "Card manufacturer from catalog (e.g., \"Topps\", \"Panini\", \"Upper Deck\")",
+                        "type": "string"
+                    },
+                    "releaseName": {
+                        "description": "Release/product name from catalog (e.g., \"Topps Chrome\", \"Prizm Basketball\")",
+                        "type": "string"
+                    },
+                    "setName": {
+                        "description": "Set name from catalog (e.g., \"Base Set\", \"Rookie Variations\")",
+                        "type": "string"
+                    },
+                    "name": {
+                        "description": "Player or subject name. Present only for exact card matches.",
+                        "type": "string"
+                    },
+                    "number": {
+                        "description": "Card number. Present only for exact card matches.",
+                        "type": "string"
+                    },
+                    "description": {
+                        "description": "Descriptive text for the card when available. Omitted if no description exists.",
+                        "type": "string"
+                    },
+                    "numberedTo": {
+                        "description": "Print run for numbered cards (e.g., 25 for a /25 card). Omitted if the card is not numbered.",
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                    },
+                    "attributes": {
+                        "description": "Notable attributes of the card (e.g., [\"Rookie\", \"Autograph\"]). Omitted if the card has no attributes.",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "variationOf": {
+                        "description": "UUID of the parent card when this card is a variation. Omitted if the card is not a variation.",
+                        "type": "string"
                     },
                     "fields": {
-                        "description": "Key-value field properties (e.g., HP, Rarity, Artist). Omitted when the card has no fields.",
+                        "description": "Key-value field properties (e.g., HP, Rarity, Artist). May include a \"CARD_LANGUAGE\" entry with the ISO 639-1 code of the scanned card language (e.g., \"ja\"). Omitted when there are no fields.",
                         "$ref": "#/components/schemas/FieldValues"
                     },
+                    "parallelSuggestions": {
+                        "description": "(beta) Possible parallels for this card, each carrying a `confidence` tier when available. Order is the identification engine's ranking, best match first; `confidence` is the strength of evidence behind that individual entry and does not re-order the list. The two are independent, so a later entry may carry a higher confidence than an earlier one. Present whenever there is any parallel evidence: a single High-confidence entry when one parallel was identified, or several entries when more than one remains possible. Omitted when there is nothing to suggest.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ParallelSuggestion"
+                        }
+                    },
                     "suggestions": {
-                        "description": "Alternative card matches when multiple reprints score similarly. Omitted when there are no suggestions.",
+                        "description": "Possible alternative card matches, best match first. Each entry is a full card record with the same fields as `card`. Included only when `confidence` is Medium or Low; omitted for High-confidence identifications and when there are no alternatives.",
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/CardSuggestion"
@@ -7617,8 +8092,8 @@
                         "description": "Display name of the segment. Examples: \"Sports\", \"Entertainment\", \"Gaming\". Used for categorizing releases and filtering."
                     },
                     "shortname": {
-                        "type": "string",
-                        "description": "Short, URL-friendly key for the segment, usable in place of the name or UUID on segment-specific routes such as /v1/identify/card/{segment} (e.g. \"magic\" for \"Magic: The Gathering\"). Null when no shortname is set."
+                        "description": "Short, URL-friendly key for the segment, usable in place of the name or UUID on segment-specific routes such as /v1/identify/card/{segment} (e.g. \"magic\" for \"Magic: The Gathering\"). Null when no shortname is set.",
+                        "type": "string"
                     },
                     "is_identifiable": {
                         "type": "boolean",
@@ -9348,8 +9823,8 @@
                         "type": "string"
                     },
                     "numberedTo": {
-                        "type": "number",
-                        "description": "Limited print run number for this parallel. Null for unlimited parallels."
+                        "description": "Limited print run number for this parallel. Null for unlimited parallels.",
+                        "type": "number"
                     }
                 },
                 "required": [
@@ -9494,7 +9969,7 @@
                     },
                     "relevance": {
                         "type": "number",
-                        "description": "Relevance score combining full-text search rank and fuzzy similarity. Higher values indicate stronger matches. Results are sorted by this score descending."
+                        "description": "Relevance score for ordering results. Higher values indicate stronger matches; results are sorted by this score descending. The value is opaque and order-only \u2014 its magnitude is not an absolute scale and may change between backend versions."
                     },
                     "year": {
                         "description": "Release year associated with this result.",
@@ -9521,6 +9996,22 @@
                         "type": "integer",
                         "exclusiveMinimum": 0,
                         "maximum": 9007199254740991
+                    },
+                    "segmentName": {
+                        "description": "Segment name for this result (e.g. \"Baseball\").",
+                        "type": "string"
+                    },
+                    "cardNumber": {
+                        "description": "Printed card number. Present on card results when available.",
+                        "type": "string"
+                    },
+                    "matchKind": {
+                        "description": "Present on every result of the page only when close-spelling (fuzzy) matching engaged for this request: \"exact\" results matched the query directly and always sort before \"fuzzy\" results. Omitted entirely when fuzzy matching did not engage.",
+                        "type": "string",
+                        "enum": [
+                            "exact",
+                            "fuzzy"
+                        ]
                     }
                 },
                 "required": [
@@ -9597,8 +10088,8 @@
                         "description": "Name of the grading company (e.g., PSA, BGS, SGC, CGC)"
                     },
                     "description": {
-                        "type": "string",
-                        "description": "Detailed description of the grading company and its services"
+                        "description": "Detailed description of the grading company and its services",
+                        "type": "string"
                     }
                 },
                 "required": [
@@ -9630,8 +10121,8 @@
                         "description": "Name of the grading type (e.g., Regular, Crossover, Black Label)"
                     },
                     "description": {
-                        "type": "string",
-                        "description": "Detailed description of what this grading type offers or represents"
+                        "description": "Detailed description of what this grading type offers or represents",
+                        "type": "string"
                     }
                 },
                 "required": [
@@ -9675,8 +10166,8 @@
                         "description": "The grade value as a string (e.g., \"10\", \"9.5\", \"8\") to support decimal and \"Authentic\" grades"
                     },
                     "condition": {
-                        "type": "string",
-                        "description": "The condition descriptor for this grade (e.g., \"GEM MINT\", \"MINT\", \"PRISTINE\")"
+                        "description": "The condition descriptor for this grade (e.g., \"GEM MINT\", \"MINT\", \"PRISTINE\")",
+                        "type": "string"
                     }
                 },
                 "required": [
@@ -9821,8 +10312,8 @@
                 "type": "object",
                 "properties": {
                     "title": {
-                        "type": "string",
-                        "description": "Listing title from marketplace"
+                        "description": "Listing title from marketplace",
+                        "type": "string"
                     },
                     "price": {
                         "type": "number",
@@ -9830,8 +10321,8 @@
                         "description": "Price in USD. For auctions this is the final sale price (the \"bid\" side); for fixed/Buy It Now this is the seller's asking price (the \"ask\" side) and is NOT necessarily a completed sale."
                     },
                     "date": {
-                        "type": "string",
-                        "description": "Date the listing ended, in ISO 8601 format"
+                        "description": "Date the listing ended, in ISO 8601 format",
+                        "type": "string"
                     },
                     "source": {
                         "type": "string",
@@ -9846,12 +10337,12 @@
                         "description": "Listing type: \"auction\" = a completed auction sale (bid side), \"fixed\" = a Buy It Now asking price (ask side)."
                     },
                     "url": {
-                        "type": "string",
-                        "description": "URL to the original listing"
+                        "description": "URL to the original listing",
+                        "type": "string"
                     },
                     "image_url": {
-                        "type": "string",
-                        "description": "Primary image URL for the listing"
+                        "description": "Primary image URL for the listing",
+                        "type": "string"
                     },
                     "parallel_id": {
                         "type": "string",
@@ -9860,8 +10351,8 @@
                         "description": "Parallel variant UUID. Null for base card listings."
                     },
                     "parallel_name": {
-                        "type": "string",
-                        "description": "Parallel variant name. Null for base card listings."
+                        "description": "Parallel variant name. Null for base card listings.",
+                        "type": "string"
                     }
                 },
                 "required": [
@@ -9895,20 +10386,20 @@
                         "description": "Type of listing"
                     },
                     "url": {
-                        "type": "string",
-                        "description": "URL to the listing"
+                        "description": "URL to the listing",
+                        "type": "string"
                     },
                     "image_url": {
-                        "type": "string",
-                        "description": "Primary image URL"
+                        "description": "Primary image URL",
+                        "type": "string"
                     },
                     "condition": {
-                        "type": "string",
-                        "description": "Condition description from seller"
+                        "description": "Condition description from seller",
+                        "type": "string"
                     },
                     "end_date": {
-                        "type": "string",
-                        "description": "Listing end date in ISO 8601 format"
+                        "description": "Listing end date in ISO 8601 format",
+                        "type": "string"
                     },
                     "bid_count": {
                         "type": "integer",
@@ -9923,8 +10414,8 @@
                         "description": "Parallel variant UUID. Null for base card listings."
                     },
                     "parallel_name": {
-                        "type": "string",
-                        "description": "Parallel variant name. Null for base card listings."
+                        "description": "Parallel variant name. Null for base card listings.",
+                        "type": "string"
                     }
                 },
                 "required": [
@@ -9975,8 +10466,8 @@
                         "description": "Card name/subject"
                     },
                     "number": {
-                        "type": "string",
-                        "description": "Card number in set"
+                        "description": "Card number in set",
+                        "type": "string"
                     },
                     "set": {
                         "description": "Set context",
@@ -10071,8 +10562,8 @@
                         "description": "Breakdown by data source"
                     },
                     "last_sale_date": {
-                        "type": "string",
-                        "description": "Date of most recent sale"
+                        "description": "Date of most recent sale",
+                        "type": "string"
                     },
                     "total_records": {
                         "type": "integer",
@@ -10463,8 +10954,8 @@
                         "description": "Card name/subject"
                     },
                     "number": {
-                        "type": "string",
-                        "description": "Card number in set"
+                        "description": "Card number in set",
+                        "type": "string"
                     },
                     "set": {
                         "description": "Set context",
@@ -10512,8 +11003,8 @@
                 "type": "object",
                 "properties": {
                     "title": {
-                        "type": "string",
-                        "description": "Listing title from marketplace"
+                        "description": "Listing title from marketplace",
+                        "type": "string"
                     },
                     "price": {
                         "type": "number",
@@ -10521,8 +11012,8 @@
                         "description": "Price in USD. For auctions this is the final sale price (the \"bid\" side); for fixed/Buy It Now this is the seller's asking price (the \"ask\" side) and is NOT necessarily a completed sale."
                     },
                     "date": {
-                        "type": "string",
-                        "description": "Date the listing ended, in ISO 8601 format"
+                        "description": "Date the listing ended, in ISO 8601 format",
+                        "type": "string"
                     },
                     "source": {
                         "type": "string",
@@ -10537,12 +11028,12 @@
                         "description": "Listing type: \"auction\" = a completed auction sale (bid side), \"fixed\" = a Buy It Now asking price (ask side)."
                     },
                     "url": {
-                        "type": "string",
-                        "description": "URL to the original listing"
+                        "description": "URL to the original listing",
+                        "type": "string"
                     },
                     "image_url": {
-                        "type": "string",
-                        "description": "Primary image URL for the listing"
+                        "description": "Primary image URL for the listing",
+                        "type": "string"
                     },
                     "parallel_id": {
                         "type": "string",
@@ -10551,8 +11042,8 @@
                         "description": "Parallel variant UUID. Null for base card listings."
                     },
                     "parallel_name": {
-                        "type": "string",
-                        "description": "Parallel variant name. Null for base card listings."
+                        "description": "Parallel variant name. Null for base card listings.",
+                        "type": "string"
                     },
                     "matched_card": {
                         "description": "Canonical card this listing matched. Omitted when the listing is unmatched.",
@@ -10594,20 +11085,20 @@
                         "description": "Type of listing"
                     },
                     "url": {
-                        "type": "string",
-                        "description": "URL to the listing"
+                        "description": "URL to the listing",
+                        "type": "string"
                     },
                     "image_url": {
-                        "type": "string",
-                        "description": "Primary image URL"
+                        "description": "Primary image URL",
+                        "type": "string"
                     },
                     "condition": {
-                        "type": "string",
-                        "description": "Condition description from seller"
+                        "description": "Condition description from seller",
+                        "type": "string"
                     },
                     "end_date": {
-                        "type": "string",
-                        "description": "Listing end date in ISO 8601 format"
+                        "description": "Listing end date in ISO 8601 format",
+                        "type": "string"
                     },
                     "bid_count": {
                         "type": "integer",
@@ -10622,8 +11113,8 @@
                         "description": "Parallel variant UUID. Null for base card listings."
                     },
                     "parallel_name": {
-                        "type": "string",
-                        "description": "Parallel variant name. Null for base card listings."
+                        "description": "Parallel variant name. Null for base card listings.",
+                        "type": "string"
                     },
                     "matched_card": {
                         "description": "Canonical card this listing matched. Omitted when the listing is unmatched.",
@@ -10771,6 +11262,241 @@
                     "meta"
                 ]
             },
+            "CandleStats": {
+                "type": "object",
+                "properties": {
+                    "mean": {
+                        "type": "number",
+                        "minimum": 0,
+                        "description": "Arithmetic mean listing price in USD for this bucket. For auction candles this aggregates final sale prices; for fixed candles it aggregates Buy It Now asking prices (not necessarily completed sales)."
+                    },
+                    "median": {
+                        "type": "number",
+                        "minimum": 0,
+                        "description": "Median listing price in USD for this bucket"
+                    },
+                    "high": {
+                        "type": "number",
+                        "minimum": 0,
+                        "description": "Highest listing price in USD in this bucket"
+                    },
+                    "low": {
+                        "type": "number",
+                        "minimum": 0,
+                        "description": "Lowest listing price in USD in this bucket"
+                    },
+                    "count": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991,
+                        "description": "Number of listings in this bucket for this listing type (after outlier filtering)"
+                    }
+                },
+                "required": [
+                    "mean",
+                    "median",
+                    "high",
+                    "low",
+                    "count"
+                ]
+            },
+            "CandlePeriod": {
+                "type": "object",
+                "properties": {
+                    "period_start": {
+                        "type": "string",
+                        "description": "Bucket start date (YYYY-MM-DD): the UTC calendar day, the Monday of the ISO week, or the 1st of the month, depending on interval."
+                    },
+                    "types": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "$ref": "#/components/schemas/CandleStats"
+                        },
+                        "description": "Stats keyed by listing type; new listing types appear as additive keys. Currently \"auction\" (completed auction sales \u2014 the bid side) and \"fixed\" (Buy It Now asking prices \u2014 the ask side, not necessarily completed sales). A type with no listings in this bucket is absent from the map."
+                    }
+                },
+                "required": [
+                    "period_start",
+                    "types"
+                ]
+            },
+            "TimeseriesTypeTotals": {
+                "type": "object",
+                "properties": {
+                    "total_count": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991,
+                        "description": "Listings included across all candles for this listing type (after outlier filtering); equals the sum of the per-candle counts."
+                    },
+                    "filtered_count": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991,
+                        "description": "Listings removed by the outlier filter for this listing type. Pre-filter total = total_count + filtered_count."
+                    }
+                },
+                "required": [
+                    "total_count",
+                    "filtered_count"
+                ]
+            },
+            "TimeseriesQueryEcho": {
+                "type": "object",
+                "properties": {
+                    "interval": {
+                        "type": "string",
+                        "description": "Rollup bucket size applied"
+                    },
+                    "periods": {
+                        "type": "integer",
+                        "exclusiveMinimum": 0,
+                        "maximum": 9007199254740991,
+                        "description": "Effective bucket count (the service applies per-interval defaults when omitted and clamps oversized values)"
+                    },
+                    "as_of_date": {
+                        "type": "string",
+                        "description": "Effective viewpoint date (UTC) the window ends on"
+                    },
+                    "listing_type": {
+                        "type": "string",
+                        "description": "Listing type filter applied"
+                    },
+                    "parallel_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                        "description": "Parallel UUID filter applied"
+                    },
+                    "grade_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                        "description": "Grade UUID filter applied"
+                    }
+                },
+                "required": [
+                    "interval",
+                    "periods",
+                    "as_of_date",
+                    "listing_type"
+                ]
+            },
+            "RawTimeseriesSection": {
+                "type": "object",
+                "properties": {
+                    "candles": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CandlePeriod"
+                        },
+                        "description": "Chronological buckets computed from ungraded listings only, oldest first. A bucket with no listings in any requested type is omitted entirely; empty when the card has no ungraded listings in the window, or when the grade_id filter pins a specific grade (which excludes ungraded listings)."
+                    },
+                    "totals": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "$ref": "#/components/schemas/TimeseriesTypeTotals"
+                        },
+                        "description": "Whole-window counts for ungraded listings, keyed by listing type. A type with no listings across the window is omitted; a type can appear with total_count 0 when all of its listings were removed by the outlier filter."
+                    }
+                },
+                "required": [
+                    "candles",
+                    "totals"
+                ]
+            },
+            "TimeseriesGradeGroup": {
+                "type": "object",
+                "properties": {
+                    "grade_value": {
+                        "type": "string",
+                        "description": "Grade value (e.g., \"10\", \"9.5\")"
+                    },
+                    "grade_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                        "description": "Grade UUID"
+                    },
+                    "candles": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CandlePeriod"
+                        },
+                        "description": "Chronological buckets computed from this grade's listings only, oldest first. A bucket with no listings in any requested type is omitted entirely."
+                    },
+                    "totals": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "$ref": "#/components/schemas/TimeseriesTypeTotals"
+                        },
+                        "description": "Whole-window counts for this grade, keyed by listing type. A type with no listings across the window is omitted; a type can appear with total_count 0 when all of its listings were removed by the outlier filter."
+                    }
+                },
+                "required": [
+                    "grade_value",
+                    "grade_id",
+                    "candles",
+                    "totals"
+                ]
+            },
+            "TimeseriesCompanyGroup": {
+                "type": "object",
+                "properties": {
+                    "company_name": {
+                        "type": "string",
+                        "description": "Grading company name (e.g., \"PSA\")"
+                    },
+                    "company_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                        "description": "Grading company UUID"
+                    },
+                    "grades": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TimeseriesGradeGroup"
+                        },
+                        "description": "Per-grade candle series for this company"
+                    }
+                },
+                "required": [
+                    "company_name",
+                    "company_id",
+                    "grades"
+                ]
+            },
+            "TimeseriesResponse": {
+                "type": "object",
+                "properties": {
+                    "card": {
+                        "description": "Card context information",
+                        "$ref": "#/components/schemas/PricingCardContext"
+                    },
+                    "query": {
+                        "description": "Echo of query parameters applied (effective values)",
+                        "$ref": "#/components/schemas/TimeseriesQueryEcho"
+                    },
+                    "raw": {
+                        "description": "Candle series computed from ungraded listings only. Always present; empty candles/totals when the card has no ungraded listings in the window, or when the grade_id filter pins a specific grade (which excludes ungraded listings \u2014 pass grade_id \"null\" for ungraded only).",
+                        "$ref": "#/components/schemas/RawTimeseriesSection"
+                    },
+                    "graded": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TimeseriesCompanyGroup"
+                        },
+                        "description": "Per-grade candle series grouped by grading company, so graded and ungraded prices never blend into one candle range. Grades with no listings in the window are omitted; empty when the card has no graded listings in the window. When the grade_id filter pins a specific grade, this contains at most that one grade."
+                    }
+                },
+                "required": [
+                    "card",
+                    "query",
+                    "raw",
+                    "graded"
+                ]
+            },
             "ReleaseCalendarEntry": {
                 "type": "object",
                 "properties": {
@@ -10785,16 +11511,16 @@
                         "description": "Name of the release"
                     },
                     "year": {
-                        "type": "string",
-                        "description": "Release year"
+                        "description": "Release year",
+                        "type": "string"
                     },
                     "release_date": {
-                        "type": "string",
-                        "description": "Expected or actual release date (YYYY-MM-DD)"
+                        "description": "Expected or actual release date (YYYY-MM-DD)",
+                        "type": "string"
                     },
                     "pre_order_date": {
-                        "type": "string",
-                        "description": "Date when pre-orders open (YYYY-MM-DD)"
+                        "description": "Date when pre-orders open (YYYY-MM-DD)",
+                        "type": "string"
                     },
                     "segment_id": {
                         "type": "string",
@@ -10874,8 +11600,8 @@
                         "description": "Grade value (e.g. \"10\", \"9.5\")"
                     },
                     "condition": {
-                        "type": "string",
-                        "description": "Condition descriptor (e.g. \"Gem Mint\")"
+                        "description": "Condition descriptor (e.g. \"Gem Mint\")",
+                        "type": "string"
                     },
                     "population": {
                         "type": "integer",
@@ -11380,7 +12106,7 @@
                 "tags": [
                     "Card Identification"
                 ],
-                "description": "Identify one or more cards from an image. The segment (sport/category) of each card is detected automatically, so a single image may contain cards from different segments (e.g., baseball and basketball). To force a specific segment, use POST /card/:segment instead. Supports both multipart/form-data and direct binary upload (image/jpeg, image/png, image/webp). Maximum file size: 20MB. Supported formats: JPEG, PNG, WebP, HEIF, HEIC.",
+                "description": "Identify one or more cards from an image. The segment (sport/category) of each card is detected automatically, so a single image may contain cards from different segments (e.g., baseball and basketball). To force a specific segment, use POST /card/:segment instead. Supports both multipart/form-data and direct binary upload (image/jpeg, image/png, image/webp). Maximum file size: 20MB. Supported formats: JPEG, PNG, WebP, HEIF, HEIC. Where a parallel variant is recognised it is returned in `card.parallelSuggestions` (beta): best match first, with a confidence tier on each entry where available.",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -11492,7 +12218,7 @@
                 "tags": [
                     "Card Identification"
                 ],
-                "description": "Identify a card from an image for a specific segment (sport). The segment can be specified by UUID, name, or shortname (case-insensitive, e.g., \"football\", \"basketball\", \"magic\"). Supports both multipart/form-data and direct binary upload (image/jpeg, image/png, image/webp). Maximum file size: 20MB. Supported formats: JPEG, PNG, WebP, HEIF, HEIC.",
+                "description": "Identify a card from an image for a specific segment (sport). The segment can be specified by UUID, name, or shortname (case-insensitive, e.g., \"football\", \"basketball\", \"magic\"). Supports both multipart/form-data and direct binary upload (image/jpeg, image/png, image/webp). Maximum file size: 20MB. Supported formats: JPEG, PNG, WebP, HEIF, HEIC. Where a parallel variant is recognised it is returned in `card.parallelSuggestions` (beta): best match first, with a confidence tier on each entry where available.",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -11849,7 +12575,7 @@
                 "tags": [
                     "Catalog"
                 ],
-                "description": "Global fuzzy search endpoint that searches across card names, set names, release names, parallel names, manufacturer names, and years simultaneously. Supports multi-word queries like \"aaron judge topps\", \"1952 mickey mantle\", or \"refractor\". Uses PostgreSQL full-text search combined with trigram similarity for typo-tolerant matching. Results are ranked by relevance and returned as a mixed list of cards, sets, releases, and parallels. Cards and sets that match a parallel name (e.g., \"Refractor\") are boosted in relevance and include the matching parallelName in the response. Slash notation is supported: append a standalone term like \"/25\" (e.g. \"aaron judge /25\") to hard-filter results to cards and parallels whose applicable parallel is serial-numbered to that value; matched results include the numberedTo field. Use the \"type\" parameter to filter to a specific entity type.",
+                "description": "Global fuzzy search endpoint that searches across card names, set names, release names, parallel names, manufacturer names, and years simultaneously. Supports multi-word queries like \"aaron judge topps\", \"1952 mickey mantle\", or \"refractor\". Matching is typo-tolerant. Results are ranked by relevance and returned as a mixed list of cards, sets, releases, and parallels. Cards and sets that match a parallel name (e.g., \"Refractor\") are boosted in relevance and include the matching parallelName in the response. Slash notation is supported: append a standalone term like \"/25\" (e.g. \"aaron judge /25\") to hard-filter results to cards and parallels whose applicable parallel is serial-numbered to that value; matched results include the numberedTo field. Use the \"type\" parameter to filter to a specific entity type.",
                 "parameters": [
                     {
                         "schema": {
@@ -11884,7 +12610,7 @@
                         "in": "query",
                         "name": "q",
                         "required": true,
-                        "description": "Free-text search query. Searches across card names, set names, release names, manufacturer names, and years simultaneously. Supports multi-word queries like \"aaron judge topps\" or \"1952 mickey mantle\". Append a standalone slash term like \"/25\" to filter to cards and parallels whose parallel is numbered to that value (e.g. \"aaron judge /25\"). Minimum 2 characters."
+                        "description": "Free-text search query. Searches across card names, set names, release names, manufacturer names, and years simultaneously. Supports multi-word queries like \"aaron judge topps\" or \"1952 mickey mantle\". Append a standalone slash term like \"/25\" to filter to cards and parallels whose parallel is numbered to that value (e.g. \"aaron judge /25\"). Minimum 2 characters (after trimming surrounding whitespace)."
                     },
                     {
                         "schema": {
@@ -12015,7 +12741,27 @@
                             }
                         }
                     },
+                    "408": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
                     "500": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
                         "description": "Default Response",
                         "content": {
                             "application/json": {
@@ -14654,7 +15400,7 @@
         "/v1/catalog/parallels": {
             "get": {
                 "operationId": "getParallels",
-                "summary": "Search for parallels across sets and releases (free)",
+                "summary": "Search for parallels across sets and releases",
                 "tags": [
                     "Catalog"
                 ],
@@ -14841,7 +15587,7 @@
         "/v1/catalog/parallels/{id}": {
             "get": {
                 "operationId": "getParallel",
-                "summary": "Get detailed parallel information (free)",
+                "summary": "Get detailed parallel information",
                 "tags": [
                     "Catalog"
                 ],
@@ -19875,6 +20621,16 @@
                             }
                         }
                     },
+                    "409": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
                     "429": {
                         "description": "Default Response",
                         "content": {
@@ -19966,6 +20722,16 @@
                         }
                     },
                     "404": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
                         "description": "Default Response",
                         "content": {
                             "application/json": {
@@ -20075,6 +20841,16 @@
                             }
                         }
                     },
+                    "409": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
                     "429": {
                         "description": "Default Response",
                         "content": {
@@ -20166,6 +20942,16 @@
                         }
                     },
                     "404": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
                         "description": "Default Response",
                         "content": {
                             "application/json": {
@@ -20275,6 +21061,16 @@
                             }
                         }
                     },
+                    "409": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
                     "429": {
                         "description": "Default Response",
                         "content": {
@@ -20375,6 +21171,16 @@
                             }
                         }
                     },
+                    "409": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
                     "429": {
                         "description": "Default Response",
                         "content": {
@@ -20443,6 +21249,16 @@
                         }
                     },
                     "401": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
                         "description": "Default Response",
                         "content": {
                             "application/json": {
@@ -21102,6 +21918,163 @@
                 }
             }
         },
+        "/v1/pricing/{card_id}/timeseries": {
+            "get": {
+                "operationId": "getCardPricingTimeseries",
+                "summary": "Get listing price time series (candlestick rollups) for a card",
+                "tags": [
+                    "Pricing"
+                ],
+                "description": "Returns per-period descriptive statistics \u2014 mean, median, high, low, and count \u2014 aggregated over a card's marketplace listings, grouped into daily, weekly, or monthly buckets. Statistics are split by grade: `raw` holds candles for ungraded listings, and `graded` holds one candle series per grade, grouped by grading company \u2014 so graded and ungraded prices never blend into one candle range. Within each series, candles are further split by listing type, following the same bid/ask semantics as GET /pricing/{card_id}: auction candles summarize completed auction sales (the \"bid\" side), while fixed candles summarize Buy It Now asking prices (the \"ask\" side \u2014 listed prices, not necessarily completed sales). The parallel dimension is request-controlled: omit parallel_id and each grade's series blends all parallels of that grade; pass \"null\" for base-card-only candles or a UUID for one parallel. Use this to chart price trends over time. The viewpoint is `as_of_date` looking backward: the newest bucket is the one containing that date (default today, UTC) and the window extends back `periods` buckets (defaults: daily 90, weekly 52, monthly 24; `periods` above 365 is rejected, while weekly values above 156 and monthly values above 120 are clamped to those per-interval caps \u2014 the response echoes the effective values). Buckets, listing types, and grades with no listings are omitted rather than returned as zeros, and a card with no listings in the window returns an empty raw section and empty graded array as a success. A grouped outlier filter is applied over the whole window per grade/parallel variant \u2014 a listing is only ever judged against other listings of its own variant; per-type filtered counts are reported in each series' totals. Statistics are descriptive summaries of raw listings \u2014 not valuations.",
+                "parameters": [
+                    {
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "daily",
+                                "weekly",
+                                "monthly"
+                            ]
+                        },
+                        "in": "query",
+                        "name": "interval",
+                        "required": true,
+                        "description": "Rollup bucket size: daily = UTC calendar day, weekly = ISO week (Monday start), monthly = calendar month."
+                    },
+                    {
+                        "schema": {
+                            "type": "integer",
+                            "exclusiveMinimum": 0,
+                            "maximum": 365
+                        },
+                        "in": "query",
+                        "name": "periods",
+                        "required": false,
+                        "description": "How many buckets to look back. Defaults per interval when omitted: daily 90, weekly 52, monthly 24. Values above 365 are rejected; weekly values above 156 and monthly values above 120 are clamped to those per-interval caps, and the response echoes the effective value."
+                    },
+                    {
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                        },
+                        "in": "query",
+                        "name": "as_of_date",
+                        "required": false,
+                        "description": "Viewpoint date (UTC, YYYY-MM-DD): the newest bucket is the one containing this date and the window extends back `periods` buckets. Defaults to today (UTC)."
+                    },
+                    {
+                        "schema": {
+                            "default": "both",
+                            "type": "string",
+                            "enum": [
+                                "auction",
+                                "fixed",
+                                "both"
+                            ]
+                        },
+                        "in": "query",
+                        "name": "listing_type",
+                        "required": false,
+                        "description": "Which listing-type series to compute. Stats are always split by type \u2014 this only restricts which types appear. auction=completed auction sales (bid side), fixed=Buy It Now asking prices (ask side, not necessarily completed sales), both=all"
+                    },
+                    {
+                        "schema": {
+                            "type": "string"
+                        },
+                        "in": "query",
+                        "name": "parallel_id",
+                        "required": false,
+                        "description": "Filter by parallel variant. Pass a UUID for a specific parallel, \"null\" for base card only, or omit for all variants."
+                    },
+                    {
+                        "schema": {
+                            "type": "string"
+                        },
+                        "in": "query",
+                        "name": "grade_id",
+                        "required": false,
+                        "description": "Filter by grade. Pass a UUID for a specific grade, \"null\" for ungraded only, or omit for all grades."
+                    },
+                    {
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                        },
+                        "in": "path",
+                        "name": "card_id",
+                        "required": true,
+                        "description": "Card UUID"
+                    }
+                ],
+                "security": [
+                    {
+                        "apiKey": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TimeseriesResponse"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TimeseriesResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/v1/pricing/search": {
             "get": {
                 "operationId": "searchPricingByTitle",
@@ -21114,13 +22087,13 @@
                     {
                         "schema": {
                             "type": "string",
-                            "minLength": 3,
+                            "minLength": 2,
                             "maxLength": 300
                         },
                         "in": "query",
                         "name": "q",
                         "required": true,
-                        "description": "Free-text search over marketplace listing titles. Surfaces historical pricing \u2014 completed auction sales (bid) and Buy It Now asking prices (ask) \u2014 including listings never matched to a canonical card. 3\u2013300 characters."
+                        "description": "Free-text search over marketplace listing titles. Surfaces historical pricing \u2014 completed auction sales (bid) and Buy It Now asking prices (ask) \u2014 including listings never matched to a canonical card. 2\u2013300 characters."
                     },
                     {
                         "schema": {
@@ -21373,13 +22346,13 @@
                     {
                         "schema": {
                             "type": "string",
-                            "minLength": 3,
+                            "minLength": 2,
                             "maxLength": 300
                         },
                         "in": "query",
                         "name": "q",
                         "required": true,
-                        "description": "Free-text search over marketplace listing titles. Surfaces active listings, including ones never matched to a canonical card. 3\u2013300 characters."
+                        "description": "Free-text search over marketplace listing titles. Surfaces active listings, including ones never matched to a canonical card. 2\u2013300 characters."
                     },
                     {
                         "schema": {

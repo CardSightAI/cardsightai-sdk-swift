@@ -5,7 +5,24 @@ All notable changes to the CardSight AI Swift SDK will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.4.0] - 2026-07-15
+## [3.0.0] - 2026-09-11
+
+### Breaking
+- **`CardDetails.parallel` removed, replaced by `parallelSuggestions`** — identification responses no longer return a single `parallel` guess on `Components.Schemas.CardDetails` (and `CardDetailsInput`). Instead, `parallelSuggestions: [ParallelSuggestion]?` returns a ranked list (best match first) of candidate parallels, each an object with `id`, `name`, optional `description`, optional `isPartial`/`cards` (for parallels scoped to a subset of a set), and optional `confidence` (`ParallelSuggestion.confidencePayload`: `.High` / `.Medium` / `.Low`). A missing `confidence` means "not assessed," not `.Low`. The field is omitted entirely when there's no parallel evidence.
+  - **Migration**: replace `card.parallel` with `card.parallelSuggestions?.first` to get the previous single-best-guess behavior; read `.confidence` on that entry if you need the new signal. Note `PricingCardContext.parallel` is unaffected — it's a different, unrelated model that still returns a single parallel.
+
+### Added
+- **New endpoint** `getCardPricingTimeseries` (`GET /v1/pricing/{card_id}/timeseries`, tag `Pricing`) via `client.raw.getCardPricingTimeseries(_:)` — per-period candlestick-style price statistics (mean/median/high/low/count) bucketed daily/weekly/monthly, split by grade (`raw` vs one series per grading company) and by listing type (auction/fixed). Required query param `interval` (`daily`/`weekly`/`monthly`); optional `periods`, `as_of_date`, `listing_type`, `parallel_id`, `grade_id`. New generated types: `TimeseriesResponse`, `TimeseriesQueryEcho`, `TimeseriesGradeGroup`, `TimeseriesCompanyGroup`, `TimeseriesTypeTotals`, `RawTimeseriesSection`, `CandlePeriod`, `CandleStats` (plus their `Input` counterparts).
+- **`CardSuggestion` gains full card fields** (`attributes`, `description`, `manufacturer`, `name`, `number`, `numberedTo`, `releaseId`, `releaseName`, `segmentId`, `setId`, `variationOf`, `year`) — populated only when identification confidence is `Medium`/`Low`, so low-confidence alternates carry enough detail to disambiguate without a follow-up lookup.
+- **`SearchResult` gains `cardNumber`, `segmentName`, `matchKind`** (`exact`/`fuzzy`) — lets callers tell an exact catalog hit from a fuzzy/trigram match and show the card's set number and segment inline.
+- **`FeedbackResponse.status` gained new values**: `new`, `confirmed_bug`, `enhancement_backlog`, `enhancement_planned`, `released`, `not_an_issue`, `closed` (existing `under_review` unchanged; `not_reviewed`/`fixed`/`wont_fix`/`duplicate`/`need_info` remain as deprecated legacy values per the spec description).
+- Detections may now include `CARD_LANGUAGE` in `card.fields`.
+- Documented `409`/`408`/`503` responses added across several operations (was previously undocumented on some endpoints).
+
+### Changed
+- Title search `q` minimum length lowered from 3 to 2 on `searchPricingByTitle` (`GET /v1/pricing/search`) and `searchMarketplaceByTitle` (`GET /v1/marketplace/search`); `searchCatalog` was already `minLength: 2` and is unchanged.
+- Parallel catalog endpoints (`getParallel`, parallel search) are no longer documented as free-tier/no-quota — the `(free)` suffix was removed from their OpenAPI summaries.
+- Refreshed the committed OpenAPI spec (78 → 79 paths, 346 → 364 schemas, 18 operation tags unchanged); regenerated types on build.
 
 ### Added
 - **Pricing history paging** — `as_of_date` query param on `GET /v1/pricing/{card_id}` (500-row cap surfaced via an advisory `messages` array).
